@@ -4,7 +4,7 @@ date: 2022-12-30 20:50:25
 tags:
 ---
 
-如何使用git来同步更新版本与多端同步写blog
+如何使用git来同步更新版本与多端同步写blog。
 
 <!--more -->
 
@@ -26,7 +26,18 @@ tags:
    sudo xcode-select --install
    ```
 
-# 2. 多端同步
+# 2.`hexo d`失败
+   在deploy新编辑的blog过程中，经常报错：
+   ```
+   fatal: unable to access 'https://github.com/a1henu/a1henu.github.io.git/': HTTP/2 stream 1 was not closed cleanly before end of the underlying stream
+   ```
+   排查发现是git默认的通信协议出了问题，可以通过将默认通信协议修改为http/1.1来解决问题：
+   ```
+   git config --global http.version HTTP/1.1
+   ```
+   完美解决。
+
+# 3. 多端同步
    成功弄好页面以后，新问题是如何在不同的电脑上如何同步我的hexo源文件以及deploy新的blog。
 
    在这里我们就可以利用git的branch进行多终端工作，每次只需从git将更新push到工作电脑，然后作出修改以及写作，最后deploy blog&pull源文件即可。
@@ -47,7 +58,7 @@ tags:
    git commit -m "add branch"
    git push
    ```
-   这样就上传完了
+   这样就上传完了。
 
    ## 更换电脑操作
    - 安装git  
