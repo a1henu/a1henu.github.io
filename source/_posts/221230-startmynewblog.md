@@ -1,12 +1,9 @@
 ---
 title: 搭建基于Github Page的Blog过程及问题
 date: 2022-12-30 20:50:25
-tags:
+tags: blog
+description: 如何使用git来同步更新版本与多端同步写blog。
 ---
-
-如何使用git来同步更新版本与多端同步写blog。
-
-<!--more -->
 
 上午在开了一个github仓库做github page，写完作业打算弄一下blog，安装nodejs和git时发现一些问题，在blog搭好前，我准备记录一下搭建过程中的所有问题。
 
@@ -15,10 +12,12 @@ tags:
    ```bash
    brew install git
    ```  
+
    随后报错：  
    ```bash
    Error: Your CLT does not support macOS 13.1.
    ```  
+   
    解决方案：  
    ```bash
    softwareupdate --all --install --force
