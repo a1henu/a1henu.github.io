@@ -8,18 +8,16 @@ description: 如何使用git来同步更新版本与多端同步写blog。
 上午在开了一个github仓库做github page，写完作业打算弄一下blog，安装nodejs和git时发现一些问题，在blog搭好前，我准备记录一下搭建过程中的所有问题。
 
 # 1. git提示
-   首先安装git，进入终端，执行如下：  
-   ```bash
+   首先安装git，进入终端，执行如下：
+   ```
    brew install git
-   ```  
-
-   随后报错：  
-   ```bash
+   ```
+   随后报错：
+   ```
    Error: Your CLT does not support macOS 13.1.
-   ```  
-   
-   解决方案：  
-   ```bash
+   ```
+   解决方案：
+   ```
    softwareupdate --all --install --force
    sudo rm -fr /Library/Developer/CommandLineTools/
    sudo xcode-select --install
