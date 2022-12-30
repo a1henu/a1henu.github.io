@@ -46,11 +46,11 @@ description: 如何使用git来同步更新版本与多端同步写blog。
 
    ## 上传分支
    首先，在github上新建一个hexo分支，并设置为default，之后在准备好的目录中打开终端，  
-   ```bash
+   ```
    git clone git@github.com:a1henu/a1henu.github.io.git
-   ```  
+   ```
    将其克隆到本地，接下来把除了`.git`以外其他文件夹删除，将博客源文件全部复制过来，将`theme`文件夹中`.git`文件夹删除，而后  
-   ```bash
+   ```
    git add .
    git commit -m "add branch"
    git push
