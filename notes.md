@@ -4,7 +4,7 @@ permalink: /notes/index.html
 title: Notes
 ---
 
-## Notes
+# Notes
 
 ## Freshman
 
