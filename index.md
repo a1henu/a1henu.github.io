@@ -13,7 +13,7 @@ I'm an undergraduate student. This is my own page for posting some blogs and sho
 * Chenxu Bai, undergraduate student
 * College of Engineering, Peking University
 * No. 5 Yiheyuan Road, Haidian District, Beijing, P.R.China 100871
-* Email: chenxu dot bai at stu dot pku dot edu dot cn
+* Email: chenxu [dot] bai [at] stu [dot] pku [dot] edu [dot] cn
 
 
 
