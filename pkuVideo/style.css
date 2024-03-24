@@ -34,3 +34,19 @@ button {
     border: none; /* 无边框 */
     border-radius: 5px; /* 圆角 */
 }
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.donation {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 10px;
+    color: #666;
+}
+
+.coin-address {
+    display: inline;
+    margin: 0;
+}
