@@ -1,0 +1,36 @@
+/* 设置body的样式，确保所有内容都在视口中居中 */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* 使身体的高度等于视口的高度 */
+    margin: 0; /* 移除默认的页边距 */
+}
+
+/* 设置中央容器的样式，这里面包含输入框和按钮 */
+.center-container {
+    display: flex;
+    flex-direction: column; /* 在垂直方向上对齐元素 */
+    align-items: center; /* 在容器内部居中对齐元素 */
+    gap: 10px; /* 在元素之间创建一些空间 */
+}
+
+/* 设置输入框的样式 */
+input[type="text"] {
+    width: 300px; /* 设定宽度 */
+    height: 40px; /* 设定高度 */
+    font-size: 16px; /* 设定字体大小 */
+    padding: 0 10px; /* 文本距离输入框边框的距离 */
+}
+
+/* 设置按钮的样式 */
+button {
+    width: 200px; /* 设定宽度 */
+    height: 40px; /* 设定高度 */
+    font-size: 16px; /* 设定字体大小 */
+    cursor: pointer; /* 鼠标悬停时显示指针形状 */
+    background-color: #007BFF; /* 背景颜色 */
+    color: white; /* 文字颜色 */
+    border: none; /* 无边框 */
+    border-radius: 5px; /* 圆角 */
+}
