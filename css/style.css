@@ -48,8 +48,37 @@ ul {
     margin-left: 20px;
 }
 
+.experience-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.date, .details, .position {
+    flex: 1;
+}
+
+.date {
+    width: 50px; 
+    font-weight: bold;
+}
+
+.details {
+    flex: 2;
+    text-align: left;
+}
+
+.position {
+    flex: 2;
+    text-align: left;
+}
+
 footer {
     text-align: center;
     margin-top: 50px;
     padding: 10px 0;
+}
+
+.github-stars {
+    vertical-align: middle;
 }
