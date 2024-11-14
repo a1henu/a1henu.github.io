@@ -78,9 +78,7 @@ ul {
 .additional-info {
     display: flex;
     justify-content: space-between;
-    margin-top: 5px;
-    font-size: 0.9em;
-    color: #000000;
+    margin-bottom: 10px;
 }
 
 .supervisor {
@@ -89,7 +87,7 @@ ul {
 }
 
 .location {
-    flex: 1;
+    flex: 2;
     text-align: right;
 }
 
