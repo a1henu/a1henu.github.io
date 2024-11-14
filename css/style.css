@@ -83,6 +83,7 @@ ul {
 
 .supervisor {
     flex: 2;
+    font-weight: bold;
     text-align: left;
 }
 
