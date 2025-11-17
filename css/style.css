@@ -58,6 +58,11 @@ a[href^="http"] {
     color: var(--accent);
 }
 
+a {
+    text-decoration-skip-ink: none;
+    text-underline-offset: 2px;
+}
+
 section {
     max-width: 860px;
     margin: 25px auto;
