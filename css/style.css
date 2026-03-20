@@ -83,6 +83,14 @@ h3 {
     color: var(--muted);
 }
 
+.publication-title {
+    margin: 0;
+    color: #1f1f1f;
+    font-size: 1em;
+    font-weight: bold;
+    line-height: 1.5;
+}
+
 ul {
     list-style-type: disc;
     margin-left: 20px;
@@ -188,4 +196,28 @@ footer {
     color: var(--muted);
     font-style: italic;
     background: rgba(31, 58, 86, 0.02);
+}
+
+.publication-list {
+    margin-top: 8px;
+}
+
+.publication-item {
+    padding: 16px 0 4px;
+    border-top: 1px solid #f0efe9;
+}
+
+.publication-item:first-of-type {
+    padding-top: 4px;
+    border-top: none;
+}
+
+.publication-badge {
+    color: #8a3b12;
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+.publication-authors {
+    margin: 8px 0 0;
 }
