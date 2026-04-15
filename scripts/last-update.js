@@ -1,4 +1,10 @@
 document.addEventListener("DOMContentLoaded", function() {
+    const lastUpdateElement = document.getElementById("last-update");
+
+    if (!lastUpdateElement) {
+        return;
+    }
+
     const repoOwner = "a1henu"; 
     const repoName = "a1henu.github.io"; 
 
@@ -11,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 month: 'long',
                 day: 'numeric'
             });
-            document.getElementById("last-update").textContent = `Last Updated on ${formattedDate}`;
+            lastUpdateElement.textContent = `Last Updated on ${formattedDate}`;
         })
         .catch(error => console.error('Error fetching GitHub data:', error));
 });
