@@ -63,7 +63,7 @@ a {
 }
 
 section {
-    max-width: 860px;
+    max-width: 900px;
     margin: 25px auto;
     padding: 24px 32px;
     background: #ffffff;
@@ -215,11 +215,89 @@ footer {
 .publication-badge {
     color: #8a3b12;
     font-weight: bold;
-    margin-right: 8px;
 }
 
 .publication-authors {
     margin: 8px 0 0;
+}
+
+.publication-grid {
+    margin-top: 12px;
+}
+
+.publication-card {
+    display: flex;
+    gap: 32px;
+    padding: 20px 0;
+    border-top: 1px solid #f0efe9;
+    align-items: center;
+}
+
+.publication-card:first-of-type {
+    padding-top: 0;
+    border-top: none;
+}
+
+.publication-teaser {
+    flex-shrink: 0;
+    width: 250px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f6f4ed;
+    border: 1px solid var(--border);
+    align-self: center;
+}
+
+.publication-teaser img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.publication-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.publication-card .publication-title {
+    margin: 0;
+    color: #1f1f1f;
+    font-size: 1em;
+    font-weight: bold;
+    line-height: 1.6;
+}
+
+.publication-venue {
+    margin: 0;
+    font-size: 1em;
+    color: #1f1f1f;
+    line-height: 1.6;
+}
+
+.publication-card .publication-authors {
+    margin: 0;
+    font-size: 1em;
+    color: #1f1f1f;
+    line-height: 1.6;
+}
+
+.publication-links {
+    margin: 0;
+    display: inline;
+    font-size: 1em;
+    line-height: 1.6;
+}
+
+.pub-link {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.pub-link:hover,
+.pub-link:focus {
+    text-decoration: underline;
 }
 
 .links-grid {
@@ -300,5 +378,14 @@ footer {
     .position,
     .location {
         text-align: left;
+    }
+
+    .publication-card {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .publication-teaser {
+        width: 100%;
     }
 }
