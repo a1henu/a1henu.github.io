@@ -33,6 +33,31 @@ header p {
     color: var(--muted);
 }
 
+.social-links {
+    margin-top: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+}
+
+.social-links a[href] {
+    display: inline-flex;
+    color: var(--muted);
+    line-height: 0;
+}
+
+.social-links a:hover,
+.social-links a:focus {
+    color: var(--accent);
+}
+
+.social-links svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+}
+
 nav {
     margin-top: 15px;
     display: inline-flex;
