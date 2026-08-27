@@ -703,17 +703,18 @@ a.pill:hover {
     margin-top: 2px;
 }
 
+/* No rule between entries — with a longer list a stack of them reads as noise.
+   The teaser image already blocks each entry out visually, so whitespace alone
+   is enough separation; padding is up from 18px to carry that on its own. */
 .publication-card {
     display: flex;
     align-items: center;
     gap: 26px;
-    padding: 18px 0;
-    border-top: 1px solid var(--hairline);
+    padding: 14px 0;
 }
 
 .publication-card:first-of-type {
     padding-top: 2px;
-    border-top: none;
 }
 
 /* Fixed box rather than a width with a free-running height. The teasers are
@@ -724,15 +725,17 @@ a.pill:hover {
    asymmetric — more vertical than horizontal. That mats the figure top and
    bottom and leaves `object-fit: cover` only a mild left/right crop (~60-70% of
    the width survives); a square-ish box with even padding would cut away half
-   the figure. Full image is one click away via the lightbox. Adjust the vertical
-   padding to trade matting against crop, or set `object-position` to pick which
-   slice shows. */
+   the figure. Adjust the vertical padding to trade matting against crop, or set
+   `object-position` to pick which slice shows. */
 .publication-teaser {
     flex: 0 0 auto;
     width: 250px;
     height: 150px;
     padding: 18px 10px;
     overflow: hidden;
+    /* Grid so both images share one cell and stack, without absolute
+       positioning fighting the padding. */
+    display: grid;
     border-radius: var(--radius-md);
     /* Hard white in both themes, not a theme token: the figures themselves have
        white backgrounds, so a white mat reads as one continuous card. A tinted
@@ -743,23 +746,32 @@ a.pill:hover {
     transition: outline-color 0.2s ease;
 }
 
-.publication-card:hover .publication-teaser {
+.publication-teaser:hover {
     outline-color: color-mix(in srgb, var(--hue) 34%, transparent);
 }
 
 .publication-teaser img {
+    grid-area: 1 / 1;          /* both images occupy the same cell */
     width: 100%;
     height: 100%;
     display: block;
     object-fit: cover;
     object-position: center;
     border-radius: 3px;
-    cursor: zoom-in;
-    transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 
-.publication-teaser:hover img {
-    transform: scale(1.04);
+/* The pipeline figure sits on top of the teaser and fades in on hover. Gated on
+   (hover: hover) so touch devices, which have no real hover, don't end up stuck
+   showing it after a tap. */
+.teaser-hover {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+@media (hover: hover) {
+    .publication-teaser:hover .teaser-hover {
+        opacity: 1;
+    }
 }
 
 .publication-content {
@@ -782,10 +794,6 @@ a.pill:hover {
     text-justify: inter-word;
     hyphens: manual;
     -webkit-hyphens: manual;
-}
-
-.publication-card:hover .publication-title {
-    color: var(--hue);
 }
 
 /* Kept as normal inline flow (not flex) so a long venue name wraps *after*
@@ -903,38 +911,6 @@ footer a {
 footer a:hover {
     color: var(--accent);
     text-decoration: underline;
-}
-
-/* --------------------------------------------------------------------------
-   Lightbox (scripts/lightbox.js)
-   -------------------------------------------------------------------------- */
-
-.lightbox {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 32px;
-    background: rgba(16, 18, 22, 0.86);
-    cursor: zoom-out;
-}
-
-.lightbox.is-open {
-    display: flex;
-}
-
-.lightbox img {
-    max-width: 100%;
-    max-height: 100%;
-    border-radius: var(--radius-md);
-    background: #ffffff;
-    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4);
-}
-
-body.lightbox-open {
-    overflow: hidden;
 }
 
 /* --------------------------------------------------------------------------
