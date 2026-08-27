@@ -736,6 +736,7 @@ a.pill:hover {
     /* Grid so both images share one cell and stack, without absolute
        positioning fighting the padding. */
     display: grid;
+    align-items: center;
     border-radius: var(--radius-md);
     /* Hard white in both themes, not a theme token: the figures themselves have
        white backgrounds, so a white mat reads as one continuous card. A tinted
@@ -753,10 +754,9 @@ a.pill:hover {
 .publication-teaser img {
     grid-area: 1 / 1;          /* both images occupy the same cell */
     width: 100%;
-    height: 100%;
+    height: auto;
     display: block;
-    object-fit: cover;
-    object-position: center;
+    align-self: center;
     border-radius: 3px;
 }
 
