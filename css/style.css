@@ -148,22 +148,31 @@ p:last-child {
 }
 
 /* Running prose is justified so every full line ends on the same right edge.
+   Measured worst-case space width vs. the ~4.9px natural space at this measure:
+   9.2px, i.e. 1.9x. Noticeable but fine.
 
-   Auto-hyphenation is deliberately OFF: Chrome does not honour the third value
-   of hyphenate-limit-chars (min characters after the break), so `hyphens: auto`
-   produced breaks like "recentl-y" with a single letter carried over. At this
-   measure (~84 characters) a line has enough word gaps to absorb the
-   justification slack on its own, so hyphens buy nothing here. The narrow
-   mobile layout re-enables them, where they do matter. */
+   Justification is dropped on mobile (see the media query). At ~35 characters a
+   line has too few word gaps to absorb the slack and spaces stretched to 15.2px
+   against a 4.4px natural space — the uneven "rivers" running down the column.
+   Hyphenation does not rescue it: turning it on only got that to 13.5px, and
+   Chrome broke words at non-dictionary points ("comp-uter", "stud-ent"), which
+   reads worse than a ragged edge. So mobile left-aligns and does not hyphenate. */
 .prose,
 .section > p,
-.news-body,
-.publication-venue,
-.publication-authors {
+.news-body {
     text-align: justify;
     text-justify: inter-word;
     hyphens: manual;
     -webkit-hyphens: manual;
+    text-wrap: pretty;
+}
+
+/* Venue and author lines are left-aligned at every width. They are proper nouns
+   so they cannot be hyphenated, and they already fit on one line at full width
+   (where justify is a no-op anyway); they only wrap on mobile, where justifying
+   them stretched spaces to 8.5px. */
+.publication-venue,
+.publication-authors {
     text-wrap: pretty;
 }
 
@@ -1085,15 +1094,20 @@ body > header:not(.topbar) ~ section > h2::after {
         font-size: 1rem;
     }
 
-    /* At ~37 characters a line has few word gaps, so justification alone would
-       leave visible rivers — here hyphenation is worth its occasional bad break.
-       Names and venues stay unhyphenated. */
+    /* Stop justifying. Measured: spaces stretch to 15.2px here against a 4.4px
+       natural space; left-aligned they sit at 4.7px. A ragged right edge on a
+       phone is normal, rivers down the middle of the column are not. */
     .prose,
     .section > p,
     .news-body {
-        hyphens: auto;
-        -webkit-hyphens: auto;
-        hyphenate-limit-chars: 8 4 4;
+        text-align: left;
+    }
+
+    /* Same reason. Titles fit on one line at full width, so justify only ever
+       kicks in once they wrap here — where it stretched spaces to 8.7px against
+       a 5.0px natural space. */
+    .publication-title {
+        text-align: left;
     }
 
     .topbar-inner,
