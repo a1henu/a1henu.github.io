@@ -1,125 +1,612 @@
+/* ==========================================================================
+   Chenxu Bai — personal homepage
+   tokens → base → topbar → hero → sections → components → responsive
+
+   Colour system: five low-saturation hues. Each section owns one via --hue,
+   which drives its heading tick, the fade on its heading rule, and the hover
+   state of any pill inside it. Body copy stays neutral everywhere.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Design tokens
+   -------------------------------------------------------------------------- */
+
 :root {
-    --accent: #1f3a56;
-    --muted: #5f636c;
-    --border: #e4e2d8;
-    --background: #ffffff;
+    /* System serif/sans stacks — no web fonts, so nothing to load and nothing
+       that depends on fonts.googleapis.com being reachable. */
+    --font-serif: "Charter", "Iowan Old Style", "Source Serif 4",
+                  "Source Serif Pro", Cambria, Georgia, "Songti SC",
+                  "Noto Serif CJK SC", serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter,
+                 "Helvetica Neue", "PingFang SC", "Hiragino Sans GB",
+                 "Microsoft YaHei", sans-serif;
+
+    /* Constrained column: prose fills it exactly, so everything on the page
+       shares one right edge, and a line stays near 85 characters. */
+    --page-width: 900px;
+    --page-gutter: 32px;
+    --topbar-height: 54px;
+    --strip-height: 3px;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 18px;
+
+    /* --- Light theme ---------------------------------------------------- */
+    color-scheme: light;
+
+    --bg: #fbfaf7;
+    --bg-tint: #f3f0e9;
+    --surface: #ffffff;
+
+    --text: #221f1c;
+    --text-muted: #6a655e;
+    --text-faint: #918b82;
+
+    --hairline: #e7e2d9;
+    --hairline-strong: #d6cfc3;
+
+    /* The five hues. All sit around the same lightness so they read as a set
+       rather than as five unrelated colours. Each clears 5:1 on --bg. */
+    --h-blue: #33608f;
+    --h-teal: #1d6a5e;
+    --h-ochre: #8a6113;
+    --h-rust: #9c4826;
+    --h-plum: #6b4176;
+
+    /* Badge accents, deliberately louder than the five section hues above. The
+       section palette is muted so it stays in the background; a venue badge has
+       to read at a glance. Both are cool and saturated, which is what makes them
+       carry on the warm paper ground — the rust and ochre they replaced were
+       warm too, so they sank into it. */
+    --h-crimson: #b32749;
+    --h-indigo: #4436a3;
+
+    --accent: var(--h-blue);
+    --accent-strong: #24486d;
+}
+
+/* --- Dark theme --------------------------------------------------------- */
+/* The inline script in <head> always resolves an explicit data-theme before
+   first paint, so this single block covers both the system preference and the
+   manual toggle. With JS off nothing sets the attribute and the light theme
+   above applies, which is a fine degradation. */
+:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --bg: #15171b;
+    --bg-tint: #1c1f25;
+    --surface: #1a1d22;
+
+    --text: #e7e3dc;
+    --text-muted: #9d978e;
+    --text-faint: #7d7770;
+
+    --hairline: #2b2f36;
+    --hairline-strong: #3a3f48;
+
+    /* Same five hues, lifted for contrast on a dark ground. */
+    --h-blue: #8fb6dd;
+    --h-teal: #74c5b4;
+    --h-ochre: #d3a851;
+    --h-rust: #dd9370;
+    --h-plum: #bd98c8;
+
+    --h-crimson: #f08fa3;
+    --h-indigo: #a49af0;
+
+    --accent: var(--h-blue);
+    --accent-strong: #b6d2f0;
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
-    font-family: 'Times New Roman', 'SimSun', sans-serif;
-    font-size: large;
     margin: 0;
-    padding: 0;
-    background-color: var(--background);
-    color: #1f1f1f;
+    background-color: var(--bg);
+    /* Two very faint washes behind the hero, so the top of the page is tinted
+       rather than flat white. */
+    background-image:
+        radial-gradient(58% 90% at 10% -12%,
+            color-mix(in srgb, var(--h-blue) 10%, transparent), transparent 72%),
+        radial-gradient(50% 80% at 90% -18%,
+            color-mix(in srgb, var(--h-teal) 9%, transparent), transparent 72%);
+    background-repeat: no-repeat;
+    background-size: 100% 560px;
+    color: var(--text);
+    font-family: var(--font-serif);
+    /* 18px against the 836px column is ~85 characters — the top of the
+       comfortable range. */
+    font-size: 1.125rem;
+    line-height: 1.72;
 }
 
-header {
-    text-align: center;
-    padding: 40px 20px 30px;
-    margin: 0;
-    background-color: #ffffff;
-    border-bottom: 1px solid var(--border);
+h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    line-height: 1.3;
+    text-wrap: balance;
 }
 
-header h1 {
-    font-size: 2em;
-    margin: 0 0 10px;
-    color: #1b2836;
+p {
+    margin: 0 0 0.9em;
 }
 
-header p {
-    margin: 6px 0;
-    color: var(--muted);
+p:last-child {
+    margin-bottom: 0;
 }
 
-.social-links {
-    margin-top: 14px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 18px;
+/* Running prose is justified so every full line ends on the same right edge.
+
+   Auto-hyphenation is deliberately OFF: Chrome does not honour the third value
+   of hyphenate-limit-chars (min characters after the break), so `hyphens: auto`
+   produced breaks like "recentl-y" with a single letter carried over. At this
+   measure (~84 characters) a line has enough word gaps to absorb the
+   justification slack on its own, so hyphens buy nothing here. The narrow
+   mobile layout re-enables them, where they do matter. */
+.prose,
+.section > p,
+.news-body,
+.publication-venue,
+.publication-authors {
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: manual;
+    -webkit-hyphens: manual;
+    text-wrap: pretty;
 }
 
-.social-links a[href] {
-    display: inline-flex;
-    color: var(--muted);
-    line-height: 0;
-}
-
-.social-links a:hover,
-.social-links a:focus {
-    color: var(--accent);
-}
-
-.social-links svg {
-    width: 22px;
-    height: 22px;
-    fill: currentColor;
-}
-
-nav {
-    margin-top: 15px;
-    display: inline-flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-nav a {
-    text-decoration: none;
-    font-weight: bold;
-    color: #1f1f1f;
-    padding-bottom: 2px;
-    border-bottom: 2px solid transparent;
-}
-
-nav a:hover,
-nav a:focus {
-    border-color: var(--accent);
-}
-
-a[href^="http"] {
-    color: var(--accent);
+::selection {
+    background: color-mix(in srgb, var(--accent) 24%, transparent);
 }
 
 a {
+    color: var(--accent);
+    text-decoration-thickness: 1px;
     text-decoration-skip-ink: none;
     text-underline-offset: 2px;
+    transition: color 0.15s ease, text-decoration-color 0.15s ease;
 }
 
-section {
-    max-width: 900px;
-    margin: 25px auto;
-    padding: 24px 32px;
-    background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.04);
+/* Body links: tinted underline that firms up on hover. */
+.section a:not(.pill),
+.hero-affiliation a {
+    text-decoration-color: color-mix(in srgb, currentColor 42%, transparent);
 }
 
-h2 {
-    font-size: 1.5em;
-    margin: 0 0 15px;
-    color: var(--accent);
+.section a:not(.pill):hover,
+.hero-affiliation a:hover {
+    text-decoration-color: currentColor;
 }
 
-h3 {
-    margin-top: 25px;
-    color: var(--muted);
+a:hover {
+    color: var(--accent-strong);
 }
 
-.publication-title {
-    margin: 0;
-    color: #1f1f1f;
-    font-size: 1em;
-    font-weight: bold;
-    line-height: 1.5;
+a:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+}
+
+img {
+    max-width: 100%;
 }
 
 ul {
-    list-style-type: disc;
-    margin-left: 20px;
-    color: #1f1f1f;
+    margin: 0 0 0.9em;
+    padding-left: 1.25em;
+}
+
+.skip-link {
+    position: absolute;
+    left: 12px;
+    top: -60px;
+    z-index: 200;
+    padding: 10px 16px;
+    background: var(--surface);
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: top 0.15s ease;
+}
+
+.skip-link:focus {
+    top: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   Sticky top bar
+   -------------------------------------------------------------------------- */
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background: var(--bg);
+    border-bottom: 1px solid var(--hairline);
+}
+
+@supports (backdrop-filter: blur(8px)) {
+    .topbar {
+        background: color-mix(in srgb, var(--bg) 82%, transparent);
+        backdrop-filter: saturate(1.6) blur(10px);
+    }
+}
+
+/* Cool-to-warm ribbon along the very top edge — the one place colour is used
+   purely decoratively. */
+.topbar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--strip-height);
+    background: linear-gradient(90deg,
+        var(--h-blue), var(--h-plum) 55%, var(--h-rust));
+}
+
+.topbar-inner {
+    max-width: var(--page-width);
+    min-height: var(--topbar-height);
+    margin: 0 auto;
+    padding: var(--strip-height) var(--page-gutter) 0;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.topbar-brand {
+    font-weight: 700;
+    font-size: 1.0625rem;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.topbar-brand:hover {
+    color: var(--accent);
+}
+
+.topbar-nav {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+}
+
+.topbar-nav a {
+    position: relative;
+    padding: 4px 0;
+    color: var(--text-muted);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+/* Each nav link underlines in the hue of the section it points at. */
+.topbar-nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 1.5px;
+    background: var(--chip, var(--accent));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.18s ease;
+}
+
+.topbar-nav a:hover,
+.topbar-nav a.is-active {
+    color: var(--text);
+}
+
+.topbar-nav a:hover::after,
+.topbar-nav a.is-active::after {
+    transform: scaleX(1);
+}
+
+.theme-toggle {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--hairline);
+    border-radius: 50%;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.theme-toggle:hover {
+    color: var(--h-ochre);
+    border-color: color-mix(in srgb, var(--h-ochre) 34%, transparent);
+    background: color-mix(in srgb, var(--h-ochre) 9%, transparent);
+}
+
+.theme-toggle svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* Show exactly one glyph per theme. */
+.theme-toggle .icon-moon { display: none; }
+:root[data-theme="dark"] .theme-toggle .icon-sun { display: none; }
+:root[data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+
+/* --------------------------------------------------------------------------
+   Page shell & sections
+   -------------------------------------------------------------------------- */
+
+.page {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 0 var(--page-gutter) 24px;
+}
+
+.section {
+    --hue: var(--accent);
+    padding: 26px 0 4px;
+    scroll-margin-top: calc(var(--topbar-height) + 20px);
+}
+
+#about        { --hue: var(--h-blue); }
+#news         { --hue: var(--h-teal); }
+#education    { --hue: var(--h-ochre); }
+#publications { --hue: var(--h-plum); }
+#contact      { --hue: var(--h-rust); }
+
+/* The final row of each section's last list carries bottom padding that stacks
+   onto the next section's padding-top. Left alone that made the boundaries
+   uneven (32px after About's tags vs 48px after a publication card). Zeroing it
+   gives every section boundary the same 30px. */
+#news .news-list li:last-child,
+#education .experience-item:last-child,
+#contact .contact-list li:last-child,
+#publications .publication-grid:last-child .publication-card:last-child {
+    padding-bottom: 0;
+}
+
+.section > h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin: 0 0 18px;
+    font-size: 1.3125rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--text);
+}
+
+/* Decorative emoji standing in for the coloured tick the headings used to
+   carry — an emoji plus a bar plus a tinted rule was too much in front of one
+   short word. The section hue still shows in the rule below. Marked
+   aria-hidden in the markup so it isn't announced. */
+.h-emoji {
+    flex: 0 0 auto;
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+                 sans-serif;
+    font-size: 0.9em;
+    line-height: 1;
+}
+
+/* Rule that starts tinted with the section hue and fades to neutral. */
+.section > h2::after {
+    content: "";
+    flex: 1 1 auto;
+    height: 1px;
+    background: var(--hairline);
+    background: linear-gradient(90deg,
+        color-mix(in srgb, var(--hue) 42%, transparent) 0%,
+        var(--hairline) 38%);
+}
+
+.section h3 {
+    margin: 26px 0 10px;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+/* --------------------------------------------------------------------------
+   Pills (hero links, publication links, tags)
+   -------------------------------------------------------------------------- */
+
+.pill {
+    --chip: var(--hue, var(--accent));
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border: 1px solid var(--hairline);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    text-decoration: none;
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+a.pill:hover {
+    color: var(--chip);
+    border-color: color-mix(in srgb, var(--chip) 38%, transparent);
+    background: color-mix(in srgb, var(--chip) 8%, transparent);
+}
+
+.pill svg {
+    width: 15px;
+    height: 15px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+/* Static, always-tinted variant — used for the research-interest tags. */
+.tag {
+    --chip: var(--accent);
+    padding: 3px 11px;
+    border: 1px solid var(--hairline);
+    border-color: color-mix(in srgb, var(--chip) 30%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--chip) 9%, transparent);
+    color: var(--chip);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    white-space: nowrap;
+}
+
+.tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 18px 0 0;
+}
+
+/* --------------------------------------------------------------------------
+   Hero
+   -------------------------------------------------------------------------- */
+
+.hero {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 44px 0 30px;
+    scroll-margin-top: var(--topbar-height);
+}
+
+.hero-photo {
+    flex: 0 0 auto;
+    width: 200px;
+    height: 200px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--bg-tint);
+    /* Hairline hue ring + soft lift, in one shadow stack. */
+    box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--h-blue) 26%, transparent),
+        0 2px 4px rgba(20, 18, 16, 0.05),
+        0 14px 32px rgba(20, 18, 16, 0.09);
+}
+
+.hero-photo img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.hero-body {
+    min-width: 0;
+}
+
+/* The name block is spaced so its overall height comes out close to the photo's,
+   rather than sitting as a compact clump against a much taller square. */
+.hero-name {
+    margin: 0 0 12px;
+    font-size: 2.375rem;
+    font-weight: 700;
+    letter-spacing: -0.022em;
+}
+
+.hero-name-cjk {
+    margin-left: 0.3em;
+    font-size: 0.6em;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    vertical-align: 0.12em;
+}
+
+.hero-affiliation {
+    margin: 0 0 9px;
+    color: var(--text-muted);
+}
+
+.hero-links {
+    margin-top: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+}
+
+/* --------------------------------------------------------------------------
+   News
+   -------------------------------------------------------------------------- */
+
+.news-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.news-list li {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    padding: 7px 0;
+}
+
+.news-date {
+    flex: 0 0 5.5em;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+    color: var(--text-faint);
+}
+
+.news-body {
+    min-width: 0;
+}
+
+/* Dot coloured by the kind of news, so the column reads at a glance. */
+.news-body::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background: var(--kind, var(--hue));
+    vertical-align: 0.2em;
+}
+
+.news-list li[data-kind="paper"]    { --kind: var(--h-plum); }
+.news-list li[data-kind="release"]  { --kind: var(--h-teal); }
+.news-list li[data-kind="position"] { --kind: var(--h-blue); }
+.news-list li[data-kind="award"]    { --kind: var(--h-ochre); }
+
+/* --------------------------------------------------------------------------
+   Education / experience rows
+   -------------------------------------------------------------------------- */
+
+.education-list {
+    margin-top: 2px;
 }
 
 .experience-group {
@@ -130,165 +617,288 @@ ul {
     padding-top: 0;
 }
 
+/* Two rows rather than three columns: the date sits on its own line, then
+   institution and role split the width. A .note rides in the date row, flush
+   right, which fills what would otherwise be dead space beside the date. */
 .experience-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-    padding-bottom: 0;
-    border-bottom: none;
-    gap: 10px;
-    font-size: 0.95em;
-    line-height: 1.4;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+    grid-template-areas:
+        "date    note"
+        "details position";
+    gap: 2px 24px;
+    padding: 14px 0;
+    border-top: 1px solid var(--hairline);
+    font-size: 0.9375rem;
+    line-height: 1.6;
 }
 
-.education-list {
-    margin-top: 10px;
-}
-
-.education-list .experience-item {
-    border-top: 1px solid #f0efe9;
-    padding-top: 10px;
-    margin-top: 10px;
-}
-
-.education-list .experience-item:first-of-type {
+.experience-item:first-of-type {
     border-top: none;
-    padding-top: 0;
-    margin-top: 0;
-}
-
-.date, .details, .position {
-    flex: 1;
+    padding-top: 2px;
 }
 
 .date {
-    flex: 1.2;
-    width: 50px; 
-    font-weight: bold;
-    text-align: left;
-    color: var(--accent);
+    grid-area: date;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    color: color-mix(in srgb, var(--hue) 82%, transparent);
+}
+
+.note {
+    grid-area: note;
+    min-width: 0;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    letter-spacing: 0.01em;
+    text-align: right;
+    color: var(--text-faint);
 }
 
 .details {
-    flex: 2;
-    text-align: left;
-    font-weight: normal;
+    grid-area: details;
+    min-width: 0;
 }
 
 .position {
-    flex: 2;
+    grid-area: position;
+    min-width: 0;
     text-align: right;
-    color: var(--muted);
-    font-weight: normal;
+    color: var(--text-muted);
 }
 
 .additional-info {
     display: flex;
     justify-content: space-between;
+    gap: 18px;
     margin-bottom: 10px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #f0efe9;
-    color: var(--muted);
+    border-bottom: 1px solid var(--hairline);
+    font-size: 0.9375rem;
+    color: var(--text-muted);
 }
 
 .supervisor {
-    flex: 2;
-    font-weight: bold;
-    text-align: left;
+    font-weight: 700;
 }
 
-.location {
-    flex: 2;
-    text-align: right;
-}
-
-footer {
-    text-align: center;
-    margin: 40px 0 10px;
-    padding: 20px 0 10px;
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-}
-
-.github-stars {
-    vertical-align: middle;
-}
-
-.quote {
-    border-left: 3px solid var(--border);
-    margin: 20px 0;
-    padding-left: 12px;
-    color: var(--muted);
-    font-style: italic;
-    background: rgba(31, 58, 86, 0.02);
-}
-
-.publication-list {
-    margin-top: 8px;
-}
-
-.publication-item {
-    padding: 16px 0 4px;
-    border-top: 1px solid #f0efe9;
-}
-
-.publication-item:first-of-type {
-    padding-top: 4px;
-    border-top: none;
-}
-
-.publication-badge {
-    color: #8a3b12;
-    font-weight: bold;
-}
-
-.publication-badge.preprint {
-    color: #2c6e63;
-}
-
-.section-subhead {
-    margin-top: 28px;
-    padding-top: 22px;
-    border-top: 1px solid var(--border);
-}
-
-.publication-authors {
-    margin: 8px 0 0;
-}
+/* --------------------------------------------------------------------------
+   Publications
+   -------------------------------------------------------------------------- */
 
 .publication-grid {
-    margin-top: 12px;
+    margin-top: 2px;
 }
 
 .publication-card {
     display: flex;
-    gap: 32px;
-    padding: 20px 0;
-    border-top: 1px solid #f0efe9;
     align-items: center;
+    gap: 26px;
+    padding: 18px 0;
+    border-top: 1px solid var(--hairline);
 }
 
 .publication-card:first-of-type {
-    padding-top: 0;
+    padding-top: 2px;
     border-top: none;
 }
 
+/* Fixed box rather than a width with a free-running height. The teasers are
+   very wide (3.34:1 and 2.91:1), so at any width that fits the row they render
+   far shorter than the 162px text block beside them.
+
+   The box height matches the text instead, and the padding is deliberately
+   asymmetric — more vertical than horizontal. That mats the figure top and
+   bottom and leaves `object-fit: cover` only a mild left/right crop (~60-70% of
+   the width survives); a square-ish box with even padding would cut away half
+   the figure. Full image is one click away via the lightbox. Adjust the vertical
+   padding to trade matting against crop, or set `object-position` to pick which
+   slice shows. */
 .publication-teaser {
-    flex-shrink: 0;
+    flex: 0 0 auto;
     width: 250px;
+    height: 150px;
+    padding: 18px 10px;
     overflow: hidden;
-    border-radius: 8px;
-    background: #f6f4ed;
-    border: 1px solid var(--border);
-    align-self: center;
+    border-radius: var(--radius-md);
+    /* Hard white in both themes, not a theme token: the figures themselves have
+       white backgrounds, so a white mat reads as one continuous card. A tinted
+       or dark mat leaves a visible seam around the figure. */
+    background: #ffffff;
+    outline: 1px solid var(--hairline);
+    outline-offset: -1px;
+    transition: outline-color 0.2s ease;
+}
+
+.publication-card:hover .publication-teaser {
+    outline-color: color-mix(in srgb, var(--hue) 34%, transparent);
 }
 
 .publication-teaser img {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 3px;
     cursor: zoom-in;
+    transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
+
+.publication-teaser:hover img {
+    transform: scale(1.04);
+}
+
+.publication-content {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.publication-title {
+    margin: 0 0 7px;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    line-height: 1.45;
+    color: var(--text);
+    transition: color 0.2s ease;
+    /* Not `balance` (inherited from the h1–h4 rule): balancing equalises line
+       lengths, which leaves every line short of the column. Fill greedily and
+       justify instead, so a title that does wrap still ends flush. */
+    text-wrap: pretty;
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: manual;
+    -webkit-hyphens: manual;
+}
+
+.publication-card:hover .publication-title {
+    color: var(--hue);
+}
+
+/* Kept as normal inline flow (not flex) so a long venue name wraps *after*
+   the badge instead of shoving it onto a line of its own. */
+.publication-venue {
+    margin: 0 0 6px;
+    max-width: none;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+.publication-badge {
+    --badge: var(--h-crimson);
+    display: inline-block;
+    margin-right: 7px;
+    padding: 1px 9px 2px;
+    border: 1px solid var(--hairline);
+    border-color: color-mix(in srgb, var(--badge) 36%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--badge) 12%, transparent);
+    color: var(--badge);
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+
+.publication-badge.preprint {
+    --badge: var(--h-teal);
+}
+
+.publication-badge.report {
+    --badge: var(--h-indigo);
+}
+
+.publication-authors {
+    margin: 0;
+    max-width: none;
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+}
+
+.publication-authors b {
+    color: var(--text);
+}
+
+.publication-links {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   Contact
+   -------------------------------------------------------------------------- */
+
+.contact-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.contact-list li {
+    display: flex;
+    /* Baseline, not the default stretch: the label and the link are different
+       sizes, so aligning their boxes leaves the text visibly off. */
+    align-items: baseline;
+    gap: 12px;
+    padding: 6px 0;
+}
+
+/* Sized just past the widest label ("Scholar", 53px) so the links still line up
+   in a column without leaving a gulf after the shorter ones. */
+.contact-label {
+    flex: 0 0 4.25em;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    letter-spacing: 0.01em;
+    color: color-mix(in srgb, var(--hue) 78%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+
+footer {
+    max-width: var(--page-width);
+    margin: 40px auto 0;
+    padding: 22px var(--page-gutter) 32px;
+    border-top: 1px solid var(--hairline);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    color: var(--text-faint);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 20px;
+}
+
+footer p {
+    margin: 0;
+    max-width: none;
+}
+
+footer a {
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   Lightbox (scripts/lightbox.js)
+   -------------------------------------------------------------------------- */
 
 .lightbox {
     position: fixed;
@@ -298,7 +908,7 @@ footer {
     align-items: center;
     justify-content: center;
     padding: 32px;
-    background: rgba(20, 22, 26, 0.82);
+    background: rgba(16, 18, 22, 0.86);
     cursor: zoom-out;
 }
 
@@ -309,59 +919,86 @@ footer {
 .lightbox img {
     max-width: 100%;
     max-height: 100%;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     background: #ffffff;
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4);
 }
 
 body.lightbox-open {
     overflow: hidden;
 }
 
-.publication-content {
-    flex: 1;
-    min-width: 0;
+/* --------------------------------------------------------------------------
+   links.html (shares this stylesheet)
+   -------------------------------------------------------------------------- */
+
+body > header:not(.topbar) {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 48px var(--page-gutter) 24px;
+    border-bottom: 1px solid var(--hairline);
+}
+
+body > header:not(.topbar) h1 {
+    margin: 0 0 6px;
+    font-size: 2rem;
+    letter-spacing: -0.02em;
+}
+
+body > header:not(.topbar) p {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+body > header:not(.topbar) nav {
+    margin-top: 16px;
     display: flex;
-    flex-direction: column;
+    gap: 20px;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
 }
 
-.publication-card .publication-title {
-    margin: 0;
-    color: #1f1f1f;
-    font-size: 1em;
-    font-weight: bold;
-    line-height: 1.6;
-}
-
-.publication-venue {
-    margin: 0;
-    font-size: 1em;
-    color: #1f1f1f;
-    line-height: 1.6;
-}
-
-.publication-card .publication-authors {
-    margin: 0;
-    font-size: 1em;
-    color: #1f1f1f;
-    line-height: 1.6;
-}
-
-.publication-links {
-    margin: 0;
-    display: inline;
-    font-size: 1em;
-    line-height: 1.6;
-}
-
-.pub-link {
-    color: var(--accent);
+body > header:not(.topbar) nav a {
+    color: var(--text-muted);
     text-decoration: none;
 }
 
-.pub-link:hover,
-.pub-link:focus {
-    text-decoration: underline;
+body > header:not(.topbar) nav a:hover {
+    color: var(--text);
+}
+
+body > header:not(.topbar) ~ section {
+    --hue: var(--h-teal);
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 34px var(--page-gutter) 4px;
+}
+
+body > header:not(.topbar) ~ section > h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    margin: 0 0 18px;
+    font-size: 1.3125rem;
+}
+
+body > header:not(.topbar) ~ section > h2::before {
+    content: "";
+    flex: 0 0 auto;
+    width: 3px;
+    height: 0.95em;
+    border-radius: 999px;
+    background: var(--hue);
+}
+
+body > header:not(.topbar) ~ section > h2::after {
+    content: "";
+    flex: 1 1 auto;
+    height: 1px;
+    background: var(--hairline);
+    background: linear-gradient(90deg,
+        color-mix(in srgb, var(--hue) 42%, transparent) 0%,
+        var(--hairline) 38%);
 }
 
 .links-grid {
@@ -370,7 +1007,7 @@ body.lightbox-open {
 
 .friend-card {
     padding: 16px 0;
-    border-top: 1px solid #f0efe9;
+    border-top: 1px solid var(--hairline);
 }
 
 .friend-card:first-of-type {
@@ -386,25 +1023,23 @@ body.lightbox-open {
     text-decoration: none;
 }
 
-.friend-card-link:hover .friend-name,
-.friend-card-link:focus .friend-name {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-}
-
-.friend-card-link:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 6px;
-    border-radius: 8px;
+.friend-card-link:hover .friend-name {
+    color: var(--hue);
 }
 
 .friend-avatar {
-    width: 72px;
-    height: 72px;
+    width: 68px;
+    height: 68px;
     border-radius: 50%;
     object-fit: cover;
-    border: 1px solid var(--border);
-    background: #f6f4ed;
+    background: var(--bg-tint);
+    outline: 1px solid var(--hairline);
+    outline-offset: -1px;
+    transition: outline-color 0.2s ease;
+}
+
+.friend-card-link:hover .friend-avatar {
+    outline-color: color-mix(in srgb, var(--hue) 40%, transparent);
 }
 
 .friend-content {
@@ -413,43 +1048,161 @@ body.lightbox-open {
 
 .friend-name {
     margin: 0;
-    color: #1f1f1f;
+    font-size: 1.0625rem;
+    transition: color 0.15s ease;
 }
 
 .friend-desc {
-    margin: 8px 0 0;
-    color: var(--muted);
+    margin: 6px 0 0;
+    font-size: 0.9375rem;
+    color: var(--text-muted);
 }
 
 .links-empty {
     margin: 8px 0 0;
-    color: var(--muted);
+    color: var(--text-muted);
 }
 
-@media (max-width: 640px) {
-    section {
-        margin: 20px 16px;
-        padding: 20px;
+/* --------------------------------------------------------------------------
+   Hue utilities
+
+   Declared last on purpose: .pill and .tag each set a default --chip, so these
+   have to come after those rules to win at equal specificity.
+   -------------------------------------------------------------------------- */
+
+.hue-blue  { --chip: var(--h-blue); }
+.hue-teal  { --chip: var(--h-teal); }
+.hue-ochre { --chip: var(--h-ochre); }
+.hue-rust  { --chip: var(--h-rust); }
+.hue-plum  { --chip: var(--h-plum); }
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 720px) {
+    body {
+        font-size: 1rem;
     }
 
-    .experience-item,
-    .additional-info,
-    .friend-card-link {
+    /* At ~37 characters a line has few word gaps, so justification alone would
+       leave visible rivers — here hyphenation is worth its occasional bad break.
+       Names and venues stay unhyphenated. */
+    .prose,
+    .section > p,
+    .news-body {
+        hyphens: auto;
+        -webkit-hyphens: auto;
+        hyphenate-limit-chars: 8 4 4;
+    }
+
+    .topbar-inner,
+    .page,
+    footer,
+    body > header:not(.topbar),
+    body > header:not(.topbar) ~ section {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .topbar-brand {
+        display: none;      /* nav needs the room on narrow screens */
+    }
+
+    .topbar-nav {
+        margin-left: 0;
+        margin-right: auto;
+        gap: 16px;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .topbar-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .hero {
         flex-direction: column;
         align-items: flex-start;
+        gap: 22px;
+        padding-top: 36px;
     }
 
-    .position,
-    .location {
+    .hero-photo {
+        width: 160px;
+        height: 160px;
+    }
+
+    .hero-name {
+        font-size: 1.875rem;
+    }
+
+    /* Single column. The note goes last here, since on one column it reads as a
+       footnote to the role rather than to the date. */
+    .experience-item {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "date"
+            "details"
+            "position"
+            "note";
+    }
+
+    .note {
+        text-align: left;
+    }
+
+    /* Same treatment for News. Side by side, the date gutter leaves the body
+       only ~27 characters, which is far too narrow to justify without rivers. */
+    .news-list li {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+        padding: 9px 0;
+    }
+
+    .news-date {
+        line-height: 1.5;
+    }
+
+    .additional-info {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .position {
         text-align: left;
     }
 
     .publication-card {
         flex-direction: column;
+        align-items: stretch;
         gap: 16px;
     }
 
     .publication-teaser {
+        /* Full width once the card stacks. At ~350px the box is close to the
+           figure's own ratio, so barely anything gets clipped here. */
+        flex: 0 0 auto;
         width: 100%;
+        height: 130px;
+        padding: 12px 10px;
+    }
+
+    footer {
+        flex-direction: column;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
     }
 }

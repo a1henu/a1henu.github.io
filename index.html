@@ -1,221 +1,311 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Chenxu Bai (白晨旭)</title>
+    <meta name="description" content="Chenxu Bai (白晨旭) — undergraduate at the School of EECS, Peking University. Computer vision, computational photography, and multimodal foundation models.">
+    <meta name="author" content="Chenxu Bai">
+
+    <!-- Explicitly declare "no icon". Without this the browser still requests
+         /favicon.ico and will happily keep showing a previously cached one. -->
+    <link rel="icon" href="data:,">
+
+    <!-- Social share preview. Swap og:image for a dedicated 1200x630 card if you make one. -->
+    <link rel="canonical" href="https://a1henu.github.io/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Chenxu Bai">
+    <meta property="og:url" content="https://a1henu.github.io/">
+    <meta property="og:title" content="Chenxu Bai (白晨旭)">
+    <meta property="og:description" content="Undergraduate at the School of EECS, Peking University. Computer vision, computational photography, and multimodal foundation models.">
+    <meta property="og:image" content="https://a1henu.github.io/publications/AE2VID/AE2VID_teaser.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Chenxu Bai (白晨旭)">
+    <meta name="twitter:description" content="Undergraduate at the School of EECS, Peking University. Computer vision, computational photography, and multimodal foundation models.">
+    <meta name="twitter:image" content="https://a1henu.github.io/publications/AE2VID/AE2VID_teaser.png">
+
     <link rel="stylesheet" href="css/style.css">
+
+    <!-- Resolve the theme before first paint so there is no flash of the wrong one. -->
+    <script>
+        (function () {
+            var stored;
+            try { stored = localStorage.getItem("theme"); } catch (e) {}
+            var dark = stored === "dark" || (!stored &&
+                window.matchMedia("(prefers-color-scheme: dark)").matches);
+            document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+        })();
+    </script>
 </head>
 <body>
 
-    <header>
-        <h1>Chenxu Bai</h1>
-        <p>
-            Undergraduate | 
-            <a href="https://eecs.pku.edu.cn/">School of EECS</a> | 
-            <a href="https://www.pku.edu.cn/">Peking University</a>
-        </p>
-        <div class="social-links">
-            <a href="mailto:chenxu.bai@stu.pku.edu.cn" title="Email" aria-label="Email">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-            </a>
-            <a href="https://github.com/a1henu" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub">
-                <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-            </a>
-            <a href="https://scholar.google.com/citations?user=SwqOhEIAAAAJ&amp;hl=en&amp;oi=ao" target="_blank" rel="noopener" title="Google Scholar" aria-label="Google Scholar">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
-            </a>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a class="topbar-brand" href="#top">Chenxu Bai</a>
+            <nav class="topbar-nav" aria-label="Sections">
+                <a class="hue-blue" href="#about">About</a>
+                <a class="hue-teal" href="#news">News</a>
+                <a class="hue-plum" href="#publications">Publications</a>
+                <a class="hue-rust" href="#contact">Contact</a>
+                <a class="hue-ochre" href="files/CV_Chenxu.pdf">CV</a>
+            </nav>
+            <button class="theme-toggle" type="button" id="theme-toggle"
+                    aria-label="Switch color theme" title="Switch color theme">
+                <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-13a1 1 0 0 1 1 1v1.5a1 1 0 0 1-2 0V5a1 1 0 0 1 1-1zm0 14a1 1 0 0 1 1 1v1.5a1 1 0 0 1-2 0V19a1 1 0 0 1 1-1zM4 12a1 1 0 0 1 1-1h1.5a1 1 0 0 1 0 2H5a1 1 0 0 1-1-1zm13.5-1H19a1 1 0 0 1 0 2h-1.5a1 1 0 0 1 0-2zM6.34 5.34a1 1 0 0 1 1.41 0l1.06 1.06a1 1 0 0 1-1.41 1.41L6.34 6.75a1 1 0 0 1 0-1.41zm8.85 8.85a1 1 0 0 1 1.41 0l1.06 1.06a1 1 0 0 1-1.41 1.41l-1.06-1.06a1 1 0 0 1 0-1.41zm2.47-8.85a1 1 0 0 1 0 1.41l-1.06 1.06a1 1 0 0 1-1.41-1.41l1.06-1.06a1 1 0 0 1 1.41 0zM9.81 14.19a1 1 0 0 1 0 1.41l-1.06 1.06a1 1 0 0 1-1.41-1.41l1.06-1.06a1 1 0 0 1 1.41 0z"/></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.3 14.2a9 9 0 0 1-11.5-11.5 1 1 0 0 0-1.3-1.2A10.5 10.5 0 1 0 22.5 15.5a1 1 0 0 0-1.2-1.3z"/></svg>
+            </button>
         </div>
-        <nav>
-            <a href="#about">About Me</a>
-            <!-- <a href="#experience">Experience</a> -->
-            <a href="#publications">Publications</a>
-            <a href="#contact">Contact</a>
-            <!-- <a href="links.html">Links</a> -->
-            <a href="files/CV_Chenxu.pdf">CV</a>
-        </nav>
     </header>
 
-    <section id="about">
-        <h2>About Me</h2>
-        <p>
-            I'm Chenxu Bai (白晨旭), an undergraduate student majoring in Computer Science at 
-            <a href="https://eecs.pku.edu.cn/">School of Electronics Engineering and Computer Science</a>, 
-            <a href="https://www.pku.edu.cn/">Peking University</a>. 
-        </p>
-        <p>
-            My background lies in the intersection of computer vision and computational photography. 
-            More recently, I have been exploring multimodal foundation models.
-        </p>
-        <p>
-            <!-- I am <b>actively seeking opportunities</b> in both academia and industry, including research 
-            internships and engineering internships. Please feel free to reach out if you think my background 
-            could be a good fit. -->
-            I am currently a research intern at <a href="https://mimo.xiaomi.com">Xiaomi MiMo</a> team, where I 
-            am working on multimodal models, especially unified models for multimodal understanding and generation. 
-            I am also a research intern at <a href="https://github.com/PKU-YuanGroup">PKU-Yuan-Lab</a>.
-        </p>
-        <p>
-            For more details, please check out my <a href="files/CV_Chenxu.pdf">CV</a>.
-        </p>
-        <!-- <blockquote class="quote">
-            <del style="text-decoration: line-through;">Lolita</del> (Vibe) Coding, light of my life, fire of my loins, my sin, my soul.
-        </blockquote> -->
+    <main class="page" id="main">
 
-        <h3>Education</h3>
-        <div class="education-list">
-            <!-- <div class="experience-item">
-                <div class="date">2020.09 - 2023.07</div>
-                <div class="details">Tianjin No.1 High School</div>
-                <div class="position">High School Student</div>
-            </div> -->
-            <div class="experience-item">
-                <div class="date">2023.09 - 2025.09</div>
-                <div class="details">College of Engineering, Peking University</div>
-                <div class="position">Undergraduate, Robotic Engineering<br>(transferred to CS; currently a minor)</div>
+        <section class="hero" id="top">
+            <div class="hero-photo">
+                <img src="images/avatar.jpg" width="600" height="600"
+                     alt="Portrait of Chenxu Bai">
             </div>
-            <div class="experience-item">
-                <div class="date">2025.09 - Present</div>
-                <div class="details">School of EECS, Peking University</div>
-                <div class="position">Undergraduate, Computer Science</div>
+            <div class="hero-body">
+                <h1 class="hero-name">Chenxu Bai<span class="hero-name-cjk">白晨旭</span></h1>
+                <p class="hero-affiliation">
+                    Undergraduate ·
+                    <a href="https://eecs.pku.edu.cn/">School of EECS</a>,
+                    <a href="https://www.pku.edu.cn/">Peking University</a>
+                </p>
+                <p class="hero-affiliation">
+                    Research Intern · <a href="https://mimo.xiaomi.com">Xiaomi MiMo</a>
+                    &amp; <a href="https://github.com/PKU-YuanGroup">PKU-Yuan Lab</a>
+                </p>
+                <div class="hero-links">
+                    <a class="pill hue-blue" href="mailto:chenxu.bai@stu.pku.edu.cn">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        Email
+                    </a>
+                    <a class="pill hue-plum" href="https://github.com/a1henu" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+                        GitHub
+                    </a>
+                    <a class="pill hue-rust" href="https://scholar.google.com/citations?user=SwqOhEIAAAAJ&amp;hl=en&amp;oi=ao" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
+                        Scholar
+                    </a>
+                    <a class="pill hue-ochre" href="files/CV_Chenxu.pdf">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2.5L18.5 10H14a1 1 0 0 1-1-1V4.5zM8 13h8v1.6H8V13zm0 3.4h8V18H8v-1.6z"/></svg>
+                        CV
+                    </a>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Experience section archived below. -->
-    <template id="archived-experience">
-    <section id="experience">
-        <h2>Experience</h2>
-
-        <div class="experience-group">
-            <div class="experience-item">
-                <div class="date">2023.11 - 2024.11</div>
-                <div class="details"><a href="http://www2.coe.pku.edu.cn/subpaget.asp?id=660">Prof. Mohan Chen</a> Research Group</div>
-                <div class="position"><a href="https://dean.pku.edu.cn/web/student_info.php?id=22">Undergraduate Research Project</a></div>
-            </div>
-            <div class="experience-item">
-                <div class="date">2024.08 - 2024.11</div>
-                <div class="details"><a href="https://www.aisi.ac.cn/">AISI</a> (AI for Science Institute, Beijing)</div>
-                <div class="position">Research Intern</div>
-            </div>
-            <div class="additional-info">
-                <span class="supervisor">Supervisor: <a href="http://www2.coe.pku.edu.cn/subpaget.asp?id=660">Prof. Mohan Chen</a></span>
-                <span class="location">Beijing</span>    
-            </div>
-            <p class="experience-summary">
-                Worked on scientific computing and open-source software development for 
-                <a href="https://github.com/deepmodeling/abacus-develop">ABACUS</a>, 
-                focusing on Python bindings, code refactoring, and research-oriented engineering.
-            </p>
-            <!-- <p>
-                My work focuses on <b>scientific computing</b>, mainly for <a href="https://abacus.ustc.edu.cn/">ABACUS</a> (原子算筹, Atomic-orbital Based Ab-initio Computation at UStc), 
-                which is an <b>open-source</b> package (GitHub Repo: <a href="https://github.com/deepmodeling/abacus-develop">abacus-develop</a> 
-                <a href="https://github.com/deepmodeling/abacus-develop"><img alt="GitHub Stars" style="vertical-align:middle" src="https://img.shields.io/github/stars/deepmodeling/abacus-develop?style=social"/></a>
-                ) based on density functional theory (DFT), aiming for large-scale electronic-structure simulations from first principles. 
+        <section class="section" id="about">
+            <h2><span class="h-emoji" aria-hidden="true">👋</span>About</h2>
+            <p>
+                I'm Chenxu Bai (白晨旭), an undergraduate student majoring in Computer Science at the
+                <a href="https://eecs.pku.edu.cn/">School of Electronics Engineering and Computer Science</a>,
+                <a href="https://www.pku.edu.cn/">Peking University</a>.
             </p>
             <p>
-                My contributions include:
+                My background lies in the intersection of computer vision and computational photography.
+                More recently, I have been exploring multimodal foundation models.
             </p>
-            <ul>
-                <li>Binding certain modules of ABACUS to Python (<b>Pythonization</b> of ABACUS)</li>
-                <li><b>Maintaining</b> and <b>refactoring</b> parts of the source code of ABACUS</li>
-            </ul> -->
-        </div>
+            <p>
+                <!-- I am <b>actively seeking opportunities</b> in both academia and industry, including research
+                internships and engineering internships. Please feel free to reach out if you think my background
+                could be a good fit. -->
+                I am currently a research intern at the <a href="https://mimo.xiaomi.com">Xiaomi MiMo</a> team, where I
+                am working on multimodal models, especially unified models for multimodal understanding and generation.
+                I am also a research intern at <a href="https://github.com/PKU-YuanGroup">PKU-Yuan Lab</a>.
+            </p>
+            <p>
+                For more details, please check out my <a href="files/CV_Chenxu.pdf">CV</a>.
+            </p>
+            <div class="tag-row">
+                <span class="tag hue-blue">Computer Vision</span>
+                <span class="tag hue-plum">Multimodal Foundation Models</span>
+            </div>
+        </section>
 
-        <div class="experience-group">
-            <div class="experience-item">
-                <div class="date">2024.11 - 2026.04</div>
-                <div class="details"><a href="https://camera.pku.edu.cn/">Camera Intelligence Lab</a>, <a href="https://idm.pku.edu.cn/">IDM/NERCVT</a></div>
-                <div class="position">Research Intern</div>
-            </div>
-            <div class="additional-info">
-                <span class="supervisor">Supervisor: <a href="https://camera.pku.edu.cn/team">Prof. Boxin Shi</a></span>
-                <span class="location">Beijing</span>    
-            </div>
-            <p class="experience-summary">
-                Conducted research on event-based imaging and computational photography, 
-                with a focus on event-based video reconstruction and all-in-one image restoration.
-            </p>
-            <ul class="experience-highlights">
-                <li><b>AE2VID</b>: co-first-author paper accepted to CVPR 2026.</li>
-                <li><b>EvAIR</b>: third-author paper under review.</li>
+        <section class="section" id="news">
+            <h2><span class="h-emoji" aria-hidden="true">🔥</span>News</h2>
+            <ul class="news-list">
+                <li data-kind="release">
+                    <span class="news-date">2026.08</span>
+                    <span class="news-body">
+                        <b>UniWorld-Design</b> technical report is released.
+                    </span>
+                </li>
+                <li data-kind="position">
+                    <span class="news-date">2026.06</span>
+                    <span class="news-body">
+                        Started as a research intern at the <b>Xiaomi MiMo</b> team.
+                    </span>
+                </li>
+                <li data-kind="paper">
+                    <span class="news-date">2026.02</span>
+                    <span class="news-body">
+                        <b>AE2VID</b> is accepted to <b>CVPR 2026</b>.
+                    </span>
+                </li>
             </ul>
-        </div>
-            
-    </section>
-    </template>
+        </section>
 
-    <section id="publications">
-        <h2>Publications</h2>
-        <div class="publication-grid">
-            <article class="publication-card">
-                <div class="publication-teaser">
-                    <img src="publications/AE2VID/AE2VID_teaser.png" alt="AE2VID Teaser">
+        <section class="section" id="education">
+            <h2><span class="h-emoji" aria-hidden="true">🎓</span>Education</h2>
+            <div class="education-list">
+                <!-- <div class="experience-item">
+                    <div class="date">2020.09 - 2023.07</div>
+                    <div class="details">Tianjin No.1 High School</div>
+                    <div class="position">High School Student</div>
+                </div> -->
+                <div class="experience-item">
+                    <div class="date">2025.09 – Present</div>
+                    <div class="details">School of EECS, Peking University</div>
+                    <div class="position">Undergraduate, Computer Science</div>
                 </div>
-                <div class="publication-content">
-                    <h3 class="publication-title">
-                        AE2VID: Event-based Video Reconstruction via Aperture Modulation
-                    </h3>
-                    <p class="publication-venue">
-                        <span class="publication-badge">[CVPR 2026]</span> IEEE/CVF Conference on Computer Vision and Pattern Recognition
-                    </p>
-                    <p class="publication-authors">
-                        <b>Chenxu Bai</b>*, Boyu Li*, Peiqi Duan†, Xinyu Zhou, Hanyue Lou, Boxin Shi†
-                    </p>
-                    <div class="publication-links">
-                        [<a href="https://a1henu.github.io/AE2VID/">Website</a>]
-                        [<a href="https://openaccess.thecvf.com/content/CVPR2026/papers/Bai_AE2VID_Event-based_Video_Reconstruction_via_Aperture_Modulation_CVPR_2026_paper.pdf">Paper</a>]
-                        [<a href="https://github.com/a1henu/AE2VID">Code</a>]
+                <div class="experience-item">
+                    <div class="date">2023.09 – 2025.09</div>
+                    <div class="note">(transferred to CS; currently a minor)</div>
+                    <div class="details">College of Engineering, Peking University</div>
+                    <div class="position">Undergraduate, Robotic Engineering</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience section archived below. -->
+        <template id="archived-experience">
+        <section id="experience">
+            <h2>Experience</h2>
+
+            <div class="experience-group">
+                <div class="experience-item">
+                    <div class="date">2023.11 - 2024.11</div>
+                    <div class="details"><a href="http://www2.coe.pku.edu.cn/subpaget.asp?id=660">Prof. Mohan Chen</a> Research Group</div>
+                    <div class="position"><a href="https://dean.pku.edu.cn/web/student_info.php?id=22">Undergraduate Research Project</a></div>
+                </div>
+                <div class="experience-item">
+                    <div class="date">2024.08 - 2024.11</div>
+                    <div class="details"><a href="https://www.aisi.ac.cn/">AISI</a> (AI for Science Institute, Beijing)</div>
+                    <div class="position">Research Intern</div>
+                </div>
+                <div class="additional-info">
+                    <span class="supervisor">Supervisor: <a href="http://www2.coe.pku.edu.cn/subpaget.asp?id=660">Prof. Mohan Chen</a></span>
+                    <span class="location">Beijing</span>
+                </div>
+                <p class="experience-summary">
+                    Worked on scientific computing and open-source software development for
+                    <a href="https://github.com/deepmodeling/abacus-develop">ABACUS</a>,
+                    focusing on Python bindings, code refactoring, and research-oriented engineering.
+                </p>
+            </div>
+
+            <div class="experience-group">
+                <div class="experience-item">
+                    <div class="date">2024.11 - 2026.04</div>
+                    <div class="details"><a href="https://camera.pku.edu.cn/">Camera Intelligence Lab</a>, <a href="https://idm.pku.edu.cn/">IDM/NERCVT</a></div>
+                    <div class="position">Research Intern</div>
+                </div>
+                <div class="additional-info">
+                    <span class="supervisor">Supervisor: <a href="https://camera.pku.edu.cn/team">Prof. Boxin Shi</a></span>
+                    <span class="location">Beijing</span>
+                </div>
+                <p class="experience-summary">
+                    Conducted research on event-based imaging and computational photography,
+                    with a focus on event-based video reconstruction and all-in-one image restoration.
+                </p>
+                <ul class="experience-highlights">
+                    <li><b>AE2VID</b>: co-first-author paper accepted to CVPR 2026.</li>
+                    <li><b>EvAIR</b>: third-author paper under review.</li>
+                </ul>
+            </div>
+
+        </section>
+        </template>
+
+        <section class="section" id="publications">
+            <h2><span class="h-emoji" aria-hidden="true">📄</span>Publications</h2>
+            <div class="publication-grid">
+                <article class="publication-card">
+                    <div class="publication-teaser">
+                        <img src="publications/AE2VID/AE2VID_teaser.png" alt="AE2VID teaser">
                     </div>
-                </div>
-            </article>
-        </div>
-
-        <h2 class="section-subhead">Technical Reports</h2>
-        <div class="publication-grid">
-            <article class="publication-card">
-                <div class="publication-teaser">
-                    <img src="publications/UniWorld-Design/UniWorld-Design_teaser.png" alt="UniWorld-Design Teaser">
-                </div>
-                <div class="publication-content">
-                    <h3 class="publication-title">
-                        UniWorld-Design: From Pixel Generation to Layer-Native Design
-                    </h3>
-                    <p class="publication-venue">
-                        <span class="publication-badge preprint">[Preprint]</span> arXiv:2608.03971, 2026
-                    </p>
-                    <p class="publication-authors">
-                        UniWorld Team
-                    </p>
-                    <div class="publication-links">
-                        [<a href="https://rabbitvis.rabbitpre.com/blog">Website</a>]
-                        [<a href="https://arxiv.org/pdf/2608.03971">Paper</a>]
-                        [<a href="https://mp.weixin.qq.com/s/XhVRP7vbo8G0U6tklcpYQg">机器之心</a>]
-                        [<a href="https://mp.weixin.qq.com/s/VeNtvie4gpmiBtKGofqbrQ">量子位</a>]
+                    <div class="publication-content">
+                        <h3 class="publication-title">
+                            AE2VID: Event-based Video Reconstruction via Aperture Modulation
+                        </h3>
+                        <p class="publication-venue">
+                            <span class="publication-badge">CVPR 2026</span>
+                            IEEE/CVF Conference on Computer Vision and Pattern Recognition
+                        </p>
+                        <p class="publication-authors">
+                            <b>Chenxu Bai</b>*, Boyu Li*, Peiqi Duan†, Xinyu Zhou, Hanyue Lou, Boxin Shi†
+                        </p>
+                        <div class="publication-links">
+                            <a class="pill" href="https://a1henu.github.io/AE2VID/">Website</a>
+                            <a class="pill" href="https://openaccess.thecvf.com/content/CVPR2026/papers/Bai_AE2VID_Event-based_Video_Reconstruction_via_Aperture_Modulation_CVPR_2026_paper.pdf">Paper</a>
+                            <a class="pill" href="https://github.com/a1henu/AE2VID">Code</a>
+                        </div>
                     </div>
-                </div>
-            </article>
-        </div>
-    </section>
+                </article>
 
-    <section id="contact">
-        <h2>Contact</h2>
-        <p>
-            You can contact me through the following ways:
-        </p>
-        <ul>
-            <li>Email: <a href="mailto:chenxu.bai@stu.pku.edu.cn">chenxu.bai@stu.pku.edu.cn</a></li>
-            <li>GitHub: <a href="https://github.com/a1henu" target="_blank">@a1henu</a></li>
-        </ul>
-    </section>
+                <article class="publication-card">
+                    <div class="publication-teaser">
+                        <img src="publications/UniWorld-Design/UniWorld-Design_teaser.png" alt="UniWorld-Design teaser">
+                    </div>
+                    <div class="publication-content">
+                        <h3 class="publication-title">
+                            UniWorld-Design: From Pixel Generation to Layer-Native Design
+                        </h3>
+                        <p class="publication-venue">
+                            <span class="publication-badge report">Tech Report</span>
+                            <span class="publication-badge preprint">Preprint</span>
+                            arXiv:2608.03971, 2026
+                        </p>
+                        <p class="publication-authors">
+                            UniWorld Team
+                        </p>
+                        <div class="publication-links">
+                            <a class="pill" href="https://rabbitvis.rabbitpre.com/blog">Website</a>
+                            <a class="pill" href="https://arxiv.org/pdf/2608.03971">Paper</a>
+                            <a class="pill" href="https://mp.weixin.qq.com/s/XhVRP7vbo8G0U6tklcpYQg">机器之心</a>
+                            <a class="pill" href="https://mp.weixin.qq.com/s/VeNtvie4gpmiBtKGofqbrQ">量子位</a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="contact">
+            <h2><span class="h-emoji" aria-hidden="true">📫</span>Contact</h2>
+            <p>
+                Feel free to reach out — I'm happy to chat about research, collaborations, or anything in between.
+            </p>
+            <ul class="contact-list">
+                <li>
+                    <span class="contact-label">Email</span>
+                    <a href="mailto:chenxu.bai@stu.pku.edu.cn">chenxu.bai@stu.pku.edu.cn</a>
+                </li>
+                <li>
+                    <span class="contact-label">GitHub</span>
+                    <a href="https://github.com/a1henu" target="_blank" rel="noopener">@a1henu</a>
+                </li>
+                <li>
+                    <span class="contact-label">Scholar</span>
+                    <a href="https://scholar.google.com/citations?user=SwqOhEIAAAAJ&amp;hl=en&amp;oi=ao" target="_blank" rel="noopener">Chenxu Bai</a>
+                </li>
+            </ul>
+        </section>
+
+    </main>
 
     <footer>
-        <p>
-            &copy; 2026 Chenxu Bai | 
-            <a href="#about" style="color: black; font-weight: bold; text-decoration: none;">Return to Top</a>
-        </p>
-        <p id="last-update" style="text-align: center; margin-top: 10px; font-size: 0.9em; color: #666;"></p>
+        <p>&copy; 2026 Chenxu Bai</p>
+        <p id="last-update"></p>
+        <p><a href="#top">Back to top ↑</a></p>
     </footer>
 
+    <script src="scripts/theme.js"></script>
+    <script src="scripts/nav.js"></script>
     <script src="scripts/last-update.js"></script>
     <script src="scripts/lightbox.js"></script>
 
