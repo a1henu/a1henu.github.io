@@ -722,11 +722,8 @@ a.pill:hover {
    far shorter than the 162px text block beside them.
 
    The box height matches the text instead, and the padding is deliberately
-   asymmetric — more vertical than horizontal. That mats the figure top and
-   bottom and leaves `object-fit: cover` only a mild left/right crop (~60-70% of
-   the width survives); a square-ish box with even padding would cut away half
-   the figure. Adjust the vertical padding to trade matting against crop, or set
-   `object-position` to pick which slice shows. */
+   asymmetric — more vertical than horizontal — so a wide figure is matted top
+   and bottom rather than pressed against the edges. */
 .publication-teaser {
     flex: 0 0 auto;
     width: 250px;
@@ -736,7 +733,14 @@ a.pill:hover {
     /* Grid so both images share one cell and stack, without absolute
        positioning fighting the padding. */
     display: grid;
-    align-items: center;
+    /* The row is pinned to the box's content height instead of being sized by
+       what's in it. Both figures live in this one row, and the pipeline is much
+       squarer than the teaser (1.87:1 vs 2.91:1); with an auto row the taller
+       one set the row height, the row overflowed the box downwards, and the
+       teaser — centred in that too-tall row — sat visibly low and clipped at
+       the bottom. minmax(0, 1fr) refuses to grow past the box. */
+    grid-template-rows: minmax(0, 1fr);
+    place-items: center;
     border-radius: var(--radius-md);
     /* Hard white in both themes, not a theme token: the figures themselves have
        white backgrounds, so a white mat reads as one continuous card. A tinted
@@ -751,12 +755,17 @@ a.pill:hover {
     outline-color: color-mix(in srgb, var(--hue) 34%, transparent);
 }
 
+/* Contained, not cropped: each figure scales down until it fits the box on both
+   axes, so whichever dimension runs out first decides the size and the other
+   one is matted. `place-items: center` on the box then centres it in the leftover
+   space, horizontally and vertically. */
 .publication-teaser img {
     grid-area: 1 / 1;          /* both images occupy the same cell */
-    width: 100%;
+    width: auto;
     height: auto;
+    max-width: 100%;
+    max-height: 100%;
     display: block;
-    align-self: center;
     border-radius: 3px;
 }
 
@@ -1171,11 +1180,15 @@ body > header:not(.topbar) ~ section > h2::after {
     }
 
     .publication-teaser {
-        /* Full width once the card stacks. At ~350px the box is close to the
-           figure's own ratio, so barely anything gets clipped here. */
+        /* Full width once the card stacks, with the height following from that
+           width instead of being a fixed 130px. At 2.5:1 the box is just tall
+           enough for the widest teaser (2.91:1) to span the full width with the
+           12px mat intact, and it keeps that proportion across phone sizes —
+           a fixed height only lands right at one viewport width. */
         flex: 0 0 auto;
         width: 100%;
-        height: 130px;
+        height: auto;
+        aspect-ratio: 2.5 / 1;
         padding: 12px 10px;
     }
 
