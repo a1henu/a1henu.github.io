@@ -63,8 +63,18 @@
 
         <section class="hero" id="top">
             <div class="hero-photo">
-                <img src="images/avatar.jpg" width="600" height="600"
+                <!-- Two portraits; one is picked at random on each page load. -->
+                <img id="hero-photo-img" width="600" height="600"
                      alt="Portrait of Chenxu Bai">
+                <noscript><img src="images/avatar1.jpg" width="600" height="600"
+                     alt="Portrait of Chenxu Bai"></noscript>
+                <script>
+                    (function () {
+                        var photos = ["images/avatar1.jpg", "images/avatar2.jpg"];
+                        document.getElementById("hero-photo-img").src =
+                            photos[Math.floor(Math.random() * photos.length)];
+                    })();
+                </script>
             </div>
             <div class="hero-body">
                 <h1 class="hero-name">Chenxu Bai<span class="hero-name-cjk">白晨旭</span></h1>
