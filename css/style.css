@@ -769,15 +769,24 @@ a.pill:hover {
     border-radius: 3px;
 }
 
-/* The pipeline figure sits on top of the teaser and fades in on hover. Gated on
+/* Crossfade between the teaser and pipeline so different image proportions do
+   not leave the teaser visible around the pipeline. Gated on
    (hover: hover) so touch devices, which have no real hover, don't end up stuck
    showing it after a tap. */
+.teaser-still,
 .teaser-hover {
-    opacity: 0;
     transition: opacity 0.3s ease;
 }
 
+.teaser-hover {
+    opacity: 0;
+}
+
 @media (hover: hover) {
+    .publication-teaser:hover .teaser-still {
+        opacity: 0;
+    }
+
     .publication-teaser:hover .teaser-hover {
         opacity: 1;
     }
@@ -795,12 +804,9 @@ a.pill:hover {
     line-height: 1.45;
     color: var(--text);
     transition: color 0.2s ease;
-    /* Not `balance` (inherited from the h1–h4 rule): balancing equalises line
-       lengths, which leaves every line short of the column. Fill greedily and
-       justify instead, so a title that does wrap still ends flush. */
+    /* Keep natural word spacing when publication titles wrap. */
     text-wrap: pretty;
-    text-align: justify;
-    text-justify: inter-word;
+    text-align: left;
     hyphens: manual;
     -webkit-hyphens: manual;
 }
@@ -1085,13 +1091,6 @@ body > header:not(.topbar) ~ section > h2::after {
     .prose,
     .section > p,
     .news-body {
-        text-align: left;
-    }
-
-    /* Same reason. Titles fit on one line at full width, so justify only ever
-       kicks in once they wrap here — where it stretched spaces to 8.7px against
-       a 5.0px natural space. */
-    .publication-title {
         text-align: left;
     }
 
