@@ -290,10 +290,10 @@ function renderPillDag(container, c, lay, opts = {}) {
     let inner, ring;
     if (id === '$refs') {
       ring = `<rect class="nd-sel" x="${fx(x - hw - 4)}" y="${fx(y - hh - 4)}" width="${2 * hw + 8}" height="${2 * hh + 8}" rx="10" fill="none" stroke="#64748b" stroke-width="2" opacity="0"/>`;
-      inner = `<clipPath id="rc${uid}"><rect x="${fx(x - hw)}" y="${fx(y - hh)}" width="${2 * hw}" height="${2 * hh}" rx="7"/></clipPath>` +
-        `<rect x="${fx(x - hw)}" y="${fx(y - hh)}" width="${2 * hw}" height="${2 * hh}" rx="7" fill="#fff" filter="url(#psh${uid})"/>` +
-        (opts.refThumb ? `<image href="${opts.refThumb}" x="${fx(x - hw)}" y="${fx(y - hh)}" width="${2 * hw}" height="${2 * hh}" preserveAspectRatio="xMidYMid slice" clip-path="url(#rc${uid})"/>` : '') +
-        `<rect x="${fx(x - hw)}" y="${fx(y - hh)}" width="${2 * hw}" height="${2 * hh}" rx="7" fill="none" stroke="#fff" stroke-width="2"/>` +
+      inner = `<clipPath id="rc${uid}"><rect x="${fx(x - hw)}" y="${fx(y - hh)}" width="${2 * hw}" height="${2 * hh}" rx="6"/></clipPath>` +
+        `<rect x="${fx(x - hw)}" y="${fx(y - hh)}" width="${2 * hw}" height="${2 * hh}" rx="6" fill="#fff" filter="url(#psh${uid})"/>` +
+        (opts.refThumb ? `<g clip-path="url(#rc${uid})"><image class="ref-img" href="${opts.refThumb}" x="${fx(x - hw)}" y="${fx(y - hh)}" width="${2 * hw}" height="${2 * hh}" preserveAspectRatio="xMidYMid slice"/></g>` : '') +
+        `<rect x="${fx(x - hw)}" y="${fx(y - hh)}" width="${2 * hw}" height="${2 * hh}" rx="6" fill="none" stroke="#fff" stroke-width="2"/>` +
         `<text x="${fx(x)}" y="${fx(y + hh + 15)}" text-anchor="middle" font-size="11.5" font-weight="600" fill="#64748b">Input image</text>`;
     } else {
       const op = opOf[id], r = 10.5, cx = x - hw + 6 + r;
@@ -327,11 +327,35 @@ function renderPillDag(container, c, lay, opts = {}) {
 
 /* ------------------------------------------------------------------ lightbox */
 const lb = $('#lightbox'), lbImg = $('.lb-img', lb), lbCap = $('.lb-cap', lb), lbStrip = $('.lb-strip', lb), lbCount = $('.lb-count', lb);
-let lbItems = [], lbIdx = 0;
+const lbFrame = $('.lb-frame', lb);
+let lbItems = [], lbIdx = 0, lbToken = 0;
+const lbPreloaded = new Set();
+const lbPreload = src => { if (src && !lbPreloaded.has(src)) { lbPreloaded.add(src); new Image().src = src; } };
+function lbShow(it) {
+  // hide the current picture at once; reveal the new one only after the <img> itself has loaded it
+  const tok = ++lbToken;
+  lbImg.classList.add('loading'); lbFrame.classList.add('loading'); lb.setAttribute('aria-busy', 'true');
+  lbImg.alt = it.title || '';
+  const reveal = () => {
+    if (tok !== lbToken) return;
+    lbImg.classList.remove('loading'); lbFrame.classList.remove('loading'); lb.removeAttribute('aria-busy');
+    for (const d of [1, -1]) { const n = lbItems[(lbIdx + d + lbItems.length) % lbItems.length]; if (n !== it) lbPreload(n.src); }
+  };
+  const swap = () => {
+    if (tok !== lbToken) return;
+    lbImg.onload = lbImg.onerror = reveal;
+    lbImg.src = it.src;
+    if (lbImg.complete && lbImg.naturalWidth) reveal();
+  };
+  const pre = new Image();
+  pre.onload = () => (pre.decode ? pre.decode().catch(() => {}) : Promise.resolve()).then(swap);
+  pre.onerror = swap;
+  pre.src = it.src;
+  lbPreloaded.add(it.src);
+}
 function lbRender() {
   const it = lbItems[lbIdx];
-  lbImg.src = it.src; lbImg.alt = it.title || '';
-  lbImg.style.animation = 'none'; void lbImg.offsetWidth; lbImg.style.animation = '';
+  lbShow(it);
   lbCap.innerHTML = `${it.title ? `<b>${esc(it.title)}</b>` : ''}${it.score ? `<span class="sc">${esc(it.score)}</span>` : ''}${it.prompt ? `<span class="pr" title="Click to expand">${esc(it.prompt)}</span>` : ''}`;
   const pr = $('.pr', lbCap); if (pr) pr.addEventListener('click', ev => { ev.stopPropagation(); pr.classList.toggle('open'); });
   lbCount.textContent = lbItems.length > 1 ? `${lbIdx + 1} / ${lbItems.length}` : '';
@@ -339,7 +363,7 @@ function lbRender() {
   if (lbItems.length > 1) lbItems.forEach((x, i) => lbStrip.append(h('button', { class: i === lbIdx ? 'sel' : '', 'aria-label': x.title || `Image ${i + 1}`, onclick: () => { lbIdx = i; lbRender(); } }, h('img', { src: x.thumb || x.src, alt: '' }))));
   $$('.lb-nav', lb).forEach(b => { b.hidden = lbItems.length < 2; });
 }
-function openLB(items, idx = 0) { lbItems = items.filter(x => x.src); lbIdx = Math.max(0, Math.min(idx, lbItems.length - 1)); if (!lbItems.length) return; lbRender(); lb.hidden = false; document.body.style.overflow = 'hidden'; $('.lb-close', lb).focus(); }
+function openLB(items, idx = 0) { const target = items[idx]; if (target && !target.src) return; lbItems = items.filter(x => x.src); lbIdx = Math.max(0, lbItems.indexOf(target)); if (!lbItems.length) return; lbRender(); lb.hidden = false; document.body.style.overflow = 'hidden'; $('.lb-close', lb).focus(); }
 function closeLB() { lb.hidden = true; document.body.style.overflow = ''; }
 const lbStep = d => { lbIdx = (lbIdx + d + lbItems.length) % lbItems.length; lbRender(); };
 lb.addEventListener('click', ev => { if (ev.target === lb || ev.target.classList.contains('lb-stage')) closeLB(); });
@@ -389,20 +413,82 @@ function legend(el, items) { el.innerHTML = items.map(([c, label, kind]) => `<sp
 const SVGNS = 'http://www.w3.org/2000/svg';
 function figure(root, fig, alt) {
   const wrap = h('div', { class: 'fig-wrap' });
-  wrap.append(h('object', { class: 'fig-base', type: 'image/svg+xml', data: fig.src, 'aria-label': alt, style: `aspect-ratio: ${fig.w} / ${fig.h}` }));
+  const obj = h('object', { class: 'fig-base', type: 'image/svg+xml', data: fig.src, 'aria-label': alt, style: `aspect-ratio: ${fig.w} / ${fig.h}` });
+  const ready = new Promise(res => obj.addEventListener('load', () => res(obj.contentDocument), { once: true }));
+  wrap.append(obj);
   const hi = document.createElementNS(SVGNS, 'svg'), ov = document.createElementNS(SVGNS, 'svg');
   for (const s of [hi, ov]) { s.setAttribute('viewBox', `0 0 ${fig.w} ${fig.h}`); s.setAttribute('preserveAspectRatio', 'none'); }
   hi.setAttribute('class', 'fig-hi'); ov.setAttribute('class', 'fig-ov');
   wrap.append(hi, ov);
   root.append(wrap);
-  return { wrap, hi, ov };
+  return { wrap, hi, ov, ready };
+}
+// Hover zoom for photos inside a paper figure. The figure is drawn again inside the photo's own clip path and
+// scaled 1.03x about the photo centre, so the photo and the marks drawn on it zoom together in a fixed frame.
+function figZoom(F, targets) {
+  F.ready.then(doc => {
+    if (!doc) return;
+    const root = doc.documentElement, XL = 'http://www.w3.org/1999/xlink';
+    const cands = [];
+    for (const u of doc.querySelectorAll('use')) {
+      if (u.closest('mask, defs, pattern, clipPath, symbol')) continue;
+      const ref = u.getAttribute('xlink:href') || u.getAttribute('href') || '', img = ref.startsWith('#') ? doc.getElementById(ref.slice(1)) : null;
+      const m = (u.getAttribute('transform') || '').match(/matrix\(([^)]+)\)/);
+      if (!img || img.tagName !== 'image' || !m) continue;
+      const [a, b, c, d, e, f] = m[1].split(/[\s,]+/).map(Number);
+      if (b || c) continue;
+      cands.push({ u, r: [e, f, e + a * +img.getAttribute('width'), f + d * +img.getAttribute('height')] });
+    }
+    const area = r => (r[2] - r[0]) * (r[3] - r[1]);
+    const iou = (p, q) => { const i = Math.max(0, Math.min(p[2], q[2]) - Math.max(p[0], q[0])) * Math.max(0, Math.min(p[3], q[3]) - Math.max(p[1], q[1])); return i / (area(p) + area(q) - i); };
+    // everything drawn, gathered once so it can be re-used inside each clip
+    const all = doc.createElementNS(SVGNS, 'g');
+    all.setAttribute('id', 'zoom-all');
+    for (const n of [...root.childNodes]) if (!(n.nodeType === 1 && n.localName === 'defs')) all.appendChild(n);
+    root.appendChild(all);
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let n = 0;
+    for (const [hit, rect] of targets) {
+      let best = null, bv = .5;
+      for (const c of cands) { const v = iou(c.r, rect); if (v > bv) { bv = v; best = c; } }
+      if (!best) continue;
+      // the photo's own frame: every clip-path / mask on its ancestors, outermost first
+      const clips = [];
+      for (let p = best.u.parentNode; p && p !== all; p = p.parentNode) {
+        const fr = ['clip-path', 'mask'].filter(k => p.hasAttribute(k)).map(k => [k, p.getAttribute(k)]);
+        if (fr.length) clips.unshift(fr);
+      }
+      if (!clips.length) continue;  // without its own frame the copy would cover the whole figure
+      const ov = doc.createElementNS(SVGNS, 'g');
+      ov.setAttribute('class', 'zoom-ov'); ov.style.display = 'none';
+      let host = ov;
+      for (const fr of clips) { const g = doc.createElementNS(SVGNS, 'g'); for (const [k, v] of fr) g.setAttribute(k, v); host.appendChild(g); host = g; }
+      const use = doc.createElementNS(SVGNS, 'use');
+      use.setAttributeNS(XL, 'xlink:href', '#zoom-all');
+      const [x0, y0, x1, y1] = best.r;
+      Object.assign(use.style, { transformBox: 'view-box', transformOrigin: `${(x0 + x1) / 2}px ${(y0 + y1) / 2}px`, transition: still ? 'none' : 'transform .25s ease' });
+      host.appendChild(use);
+      root.appendChild(ov);
+      let on = false, timer = 0;
+      hit.addEventListener('mouseenter', () => {
+        on = true; clearTimeout(timer); ov.style.display = '';
+        requestAnimationFrame(() => requestAnimationFrame(() => { if (on) use.style.transform = 'scale(1.03)'; }));
+      });
+      hit.addEventListener('mouseleave', () => {
+        on = false; use.style.transform = '';
+        timer = setTimeout(() => { if (!on) ov.style.display = 'none'; }, still ? 0 : 300);
+      });
+      n++;
+    }
+    F.wrap.dataset.zoomed = `${n}/${targets.length}`;
+  });
 }
 const R4 = (r, pad = 0) => `x="${fx(r[0] - pad)}" y="${fx(r[1] - pad)}" width="${fx(r[2] - r[0] + 2 * pad)}" height="${fx(r[3] - r[1] + 2 * pad)}"`;
 
 /* ------------------------------------------------------------------ teaser */
 (function teaser() {
   const T = D.teaser, G = D.teaser_geo, root = $('#teaser-root');
-  const { hi, ov } = figure(root, D.figures.teaser, 'GenDAG teaser: a melted-snowman request answered by Qwen-Image-2.1, GPT-Image-2, GEMS and GenDAG');
+  const F = figure(root, D.figures.teaser, 'GenDAG teaser: a melted-snowman request answered by Qwen-Image-2.1, GPT-Image-2, GEMS and GenDAG'), { hi, ov } = F;
   const SYS = { qwen: 'Qwen-Image-2.1', gpt: 'GPT-Image-2', gems: 'GEMS', ours: 'GenDAG w/ Qwen-Image-2.1' };
   // highlight layer (multiply): prompt phrases, checklist rows, checklist columns
   let s = '';
@@ -453,6 +539,7 @@ const R4 = (r, pad = 0) => `x="${fx(r[0] - pad)}" y="${fx(r[1] - pad)}" width="$
     bindTip(e, `<b>${fbItems[i].title}</b> <span class="tt-sub">${fbItems[i].score}</span>`);
     e.addEventListener('click', () => openLB(fbItems, i));
   });
+  figZoom(F, [...$$('.hit.photo', ov).map(e => [e, G.photos[e.dataset.col]]), ...$$('.hit.fb', ov).map(e => [e, G.feedback[+e.dataset.i]])]);
   const O = D.overview;
   const PILL = {
     Analyze: 'Recognizes the remnants of a melted snowman.',
@@ -467,7 +554,7 @@ const R4 = (r, pad = 0) => `x="${fx(r[0] - pad)}" y="${fx(r[1] - pad)}" width="$
 /* ------------------------------------------------------------------ overview */
 (function overview() {
   const O = D.overview, G = D.overview_geo, root = $('#overview-root');
-  const { hi, ov } = figure(root, D.figures.overview, 'GenDAG overview: plan loop with planner, checker and proposed DAG; execution with visual feedback');
+  const F = figure(root, D.figures.overview, 'GenDAG overview: plan loop with planner, checker and proposed DAG; execution with visual feedback'), { hi, ov } = F;
   const cap = h('div', { class: 'ov-caption', 'aria-live': 'polite' });
   root.append(cap);
   let s = '';
@@ -491,6 +578,7 @@ const R4 = (r, pad = 0) => `x="${fx(r[0] - pad)}" y="${fx(r[1] - pad)}" width="$
     bindTip(e, `<b>${items[i].title}</b> <span class="tt-sub">${items[i].score}</span>${f.length ? `<br>${f.map(q => '✕ ' + esc(q)).join('<br>')}` : ''}`);
     e.addEventListener('click', () => openLB(items, i));
   });
+  figZoom(F, $$('.hit.round', ov).map(e => [e, G.rounds[+e.dataset.i]]));
   $$('.hit.dot', ov).forEach(e => {
     const ri = +e.dataset.r, qi = +e.dataset.q, ok = O.rounds[ri].marks[qi] === 'P';
     bindTip(e, `<b>${ok ? 'Pass' : 'Fail'}</b> <span class="tt-sub">${esc(O.questions[qi])}</span>`);
@@ -651,14 +739,14 @@ const R4 = (r, pad = 0) => `x="${fx(r[0] - pad)}" y="${fx(r[1] - pad)}" width="$
 (function explorer() {
   const picker = $('#case-picker'), view = $('#explorer-view'), cases = D.explorer;
   cases.forEach((c, i) => picker.append(h('button', { class: 'case-btn', role: 'tab', 'aria-selected': 'false', onclick: () => show(i) },
-    h('img', { src: c.final.s, alt: '', loading: 'lazy' }), h('div', { class: 'cb-bench' }, { wise: 'WISE', geneval2: 'GenEval2', corebench: 'CoReBench', agentgen: 'AgentGen', mindbench: 'Mind-Bench' }[c.bench]), h('div', { class: 'cb-title' }, c.title))));
+    h('span', { class: 'zoom' }, h('img', { src: c.final.s, alt: '', loading: 'lazy' })), h('div', { class: 'cb-bench' }, { wise: 'WISE', geneval2: 'GenEval2', corebench: 'CoReBench', agentgen: 'AgentGen', mindbench: 'Mind-Bench' }[c.bench]), h('div', { class: 'cb-title' }, c.title))));
   function show(i) {
     [...picker.children].forEach((b, k) => { b.classList.toggle('sel', k === i); b.setAttribute('aria-selected', String(k === i)); });
     const c = cases[i];
     view.innerHTML = '';
     const reqBody = h('div', {}, h('div', { class: 'req-text' }, c.prompt || ''), h('div', { class: 'req-meta' }, `${c.blurb}`));
-    const req = h('div', { class: 'ex-request ex-request-in' }, h('div', { class: 'req-row' }, ...c.inputs.map(im => { const el = h('img', { src: im.s, alt: 'Input image', title: 'Input image' }); el.addEventListener('click', () => openLB([{ src: im.l, title: 'Input image' }])); return el; }), reqBody));
-    const jsonBtn = h('button', { class: 'linkish', style: 'margin:0;font-size:12px;text-transform:none;letter-spacing:0' }, 'Plan JSON');
+    const req = h('div', { class: 'ex-request ex-request-in' }, h('div', { class: 'req-row' }, ...c.inputs.map(im => { const el = h('img', { src: im.s, alt: 'Input image', title: 'Input image' }); el.addEventListener('click', () => openLB([{ src: im.l, title: 'Input image' }])); return h('span', { class: 'zoom' }, el); }), reqBody));
+    const jsonBtn = h('button', { class: 'linkish', style: 'margin:0;text-transform:none;letter-spacing:0' }, 'Plan JSON');
     const dagBox = h('div', { class: 'dag-box' });
     const dagCard = h('div', { class: 'ex-card ex-dag pill' }, req, h('div', { class: 'ex-label' }, h('span', {}, `Plan · ${c.nodes.length} operators`), jsonBtn), dagBox);
     const st = scoreText(c.bench, c.score);
@@ -683,8 +771,8 @@ const R4 = (r, pad = 0) => `x="${fx(r[0] - pad)}" y="${fx(r[1] - pad)}" width="$
   }
   const list = items => h('ul', {}, items.map(t => h('li', {}, t)));
   const sec = t => h('h5', {}, t);
-  function head(el, iconOp, name, sub, right) {
-    el.append(h('div', { class: 'det-head', html: (iconOp ? opIcon(iconOp, 28) : '') + `<div><div class="det-op">${esc(name)}</div>${sub ? `<div class="det-sig">${esc(sub)}</div>` : ''}</div>${right ? `<div class="det-reads">${esc(right)}</div>` : ''}` }));
+  function head(el, iconOp, name, sub) {
+    el.append(h('div', { class: 'det-head', html: (iconOp ? opIcon(iconOp, 28) : '') + `<div><div class="det-op">${esc(name)}</div>${sub ? `<div class="det-sig">${esc(sub)}</div>` : ''}</div>` }));
   }
   function renderDetail(c, id, el, g, best) {
     el.innerHTML = '';
@@ -698,7 +786,7 @@ const R4 = (r, pad = 0) => `x="${fx(r[0] - pad)}" y="${fx(r[1] - pad)}" width="$
       head(el, 'Generate', 'Final visual checks', 'yes/no questions from the request, the facts and the prompt');
       const rounds = c.checks;
       const items = rounds.map((r, k) => ({ src: r.image && r.image.l, thumb: r.image && r.image.s, title: k ? `Regeneration ${k}` : 'Plan output', score: `${Math.round(100 * (r.pass_ratio ?? 0))}% of checks` }));
-      const grid = h('div', { class: 'rounds' }, rounds.map((r, k) => { const im = h('img', { src: r.image ? r.image.s : '', alt: items[k].title }); im.addEventListener('click', () => openLB(items, k)); return h('div', { class: 'round' + (k === best ? ' pass' : '') }, im, h('div', { class: 'r-label', html: `<span class="pip ${r.correct ? 'ok' : 'no'}"></span>${k ? `Regen ${k}` : 'Plan'} · <b>${Math.round(100 * (r.pass_ratio ?? 0))}%</b>` })); }));
+      const grid = h('div', { class: 'rounds' }, rounds.map((r, k) => { const im = h('img', { src: r.image ? r.image.s : '', alt: items[k].title }); im.addEventListener('click', () => openLB(items, k)); return h('div', { class: 'round' + (k === best ? ' pass' : '') }, h('div', { class: 'zoom' }, im), h('div', { class: 'r-label', html: `<span class="pip ${r.correct ? 'ok' : 'no'}"></span>${k ? `Regen ${k}` : 'Plan'} · <b>${Math.round(100 * (r.pass_ratio ?? 0))}%</b>` })); }));
       const fails = rounds.flatMap((r, k) => r.failed.map(t => h('li', {}, h('span', { class: 'r-tag' }, k ? `Regen ${k}` : 'Plan'), t)));
       el.append(h('div', { class: 'det-body det-cols' }, h('div', {}, sec('Candidates'), grid), h('div', {}, sec('Failed checks'), fails.length ? h('ul', { class: 'fails' }, fails) : h('p', { style: 'margin:0' }, 'None.'))));
       return;
@@ -706,9 +794,7 @@ const R4 = (r, pad = 0) => `x="${fx(r[0] - pad)}" y="${fx(r[1] - pad)}" width="$
     if (id === '$refs') { head(el, '$refs', 'Input image', 'supplied with the request'); return; }
     const n = c.nodes.find(x => x.id === id), d = c.details[id] || {}, sig = SIG[n.op];
     const label = nid => { if (nid === '$refs') return 'the input image'; const op = (c.nodes.find(x => x.id === nid) || {}).op || nid; const same = c.nodes.filter(x => x.op === op); return same.length > 1 ? `${op} ${same.findIndex(x => x.id === nid) + 1}` : op; };
-    const ins = g.edges.filter(e => e.to === id), outs = [...new Set(g.edges.filter(e => e.from === id).map(e => e.to))];
-    const reads = ins.length ? `reads ${ins.map(e => `${e.type} from ${label(e.from)}`).join(', ')}` : 'reads the request';
-    head(el, n.op, label(id), sig ? `${sig.inputs} → ${sig.output}` : '', reads + (outs.length ? ` · feeds ${outs.map(label).join(', ')}` : ''));
+    head(el, n.op, label(id), sig ? `${sig.inputs} → ${sig.output}` : '');
     const body = h('div', { class: 'det-body det-cols' });
     const one = () => body.classList.add('one');
     switch (d.kind) {
@@ -738,14 +824,14 @@ const R4 = (r, pad = 0) => `x="${fx(r[0] - pad)}" y="${fx(r[1] - pad)}" width="$
         break;
       case 'generate': {
         one();
-        const im = h('img', { src: d.image ? d.image.s : '', alt: '', style: 'width:150px;border-radius:6px;cursor:zoom-in' });
+        const im = h('img', { src: d.image ? d.image.s : '', alt: 'Generate output', style: 'width:100%;display:block;cursor:zoom-in' });
         im.addEventListener('click', () => openLB([{ src: d.image.l, title: 'Generate output', prompt: 'Before the final checks' }]));
-        body.append(h('div', { style: 'display:flex;gap:16px;align-items:flex-start' }, d.image ? im : null, h('p', { style: 'margin:0' }, d.refs ? `Generated from the rewritten prompt with ${d.refs} reference image${d.refs > 1 ? 's' : ''}.` : 'Generated from the rewritten prompt.')));
+        body.append(h('div', { style: 'display:flex;gap:16px;align-items:flex-start' }, d.image ? h('span', { class: 'zoom', style: 'width:150px;flex:none' }, im) : null, h('p', { style: 'margin:0' }, d.refs ? `Generated from the rewritten prompt with ${d.refs} reference image${d.refs > 1 ? 's' : ''}.` : 'Generated from the rewritten prompt.')));
         break;
       }
       case 'refine': {
         const items = d.rounds.map((r, k) => ({ src: r.image && r.image.l, thumb: r.image && r.image.s, title: `RefineLoop round ${k + 1}`, score: r.verify ? `${r.verify.passed}/${r.verify.total} checks` : '' }));
-        const grid = h('div', { class: 'rounds' }, d.rounds.map((r, k) => { const ok = r.verify && r.verify.passed === r.verify.total; const im = h('img', { src: r.image ? r.image.s : '', alt: items[k].title }); im.addEventListener('click', () => openLB(items, k)); return h('div', { class: 'round' + (ok ? ' pass' : '') }, im, h('div', { class: 'r-label', html: `<span class="pip ${ok ? 'ok' : 'no'}"></span>R${k + 1} · <b>${r.verify ? `${r.verify.passed}/${r.verify.total}` : '—'}</b>` })); }));
+        const grid = h('div', { class: 'rounds' }, d.rounds.map((r, k) => { const ok = r.verify && r.verify.passed === r.verify.total; const im = h('img', { src: r.image ? r.image.s : '', alt: items[k].title }); im.addEventListener('click', () => openLB(items, k)); return h('div', { class: 'round' + (ok ? ' pass' : '') }, h('div', { class: 'zoom' }, im), h('div', { class: 'r-label', html: `<span class="pip ${ok ? 'ok' : 'no'}"></span>R${k + 1} · <b>${r.verify ? `${r.verify.passed}/${r.verify.total}` : '—'}</b>` })); }));
         const fails = d.rounds.flatMap((r, k) => (r.verify ? r.verify.failed.map(t => h('li', {}, h('span', { class: 'r-tag' }, `R${k + 1}`), t)) : []));
         body.append(h('div', {}, sec(`Rounds${d.checklist_size ? ` · ${d.checklist_size}-item checklist` : ''}`), grid),
           h('div', {}, sec('Failed checks that drove revision'), fails.length ? h('ul', { class: 'fails' }, fails) : h('p', { style: 'margin:0' }, 'None: the first image passed every item.')));
