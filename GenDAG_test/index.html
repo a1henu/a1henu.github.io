@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GenDAG: Rivaling Proprietary Image Generators with Open Models and Agentic Planning</title>
+<meta name="description" content="GenDAG plans a query-adaptive DAG of typed operators for each image request. With Qwen-Image-2.1 and no fine-tuning it exceeds GPT-Image-2 and Nano Banana Pro on WISE and T2I-CoReBench.">
+<meta property="og:title" content="GenDAG: Rivaling Proprietary Image Generators with Open Models and Agentic Planning">
+<meta property="og:description" content="An agent that plans which operations to run and what information each one consumes, for every image request.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='8' cy='16' r='5' fill='%232a78d6'/%3E%3Ccircle cx='24' cy='8' r='5' fill='%23eb6834'/%3E%3Ccircle cx='24' cy='24' r='5' fill='%231baf7a'/%3E%3Cpath d='M12 14 L20 9 M12 18 L20 23' stroke='%2394a3b8' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<nav class="topnav" aria-label="Sections">
+  <div class="nav-inner">
+    <a class="brand" href="#top">GenDAG</a>
+    <div class="nav-links">
+      <a href="#overview">Method</a>
+      <a href="#explorer">Plans</a>
+      <a href="#results">Results</a>
+      <a href="#gallery">Gallery</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <h1 class="title">GenDAG</h1>
+    <p class="subtitle">Rivaling Proprietary Image Generators with Open Models and Agentic Planning</p>
+    <p class="authors">
+      <span><a href="https://a1henu.github.io/">Chenxu Bai</a><sup>1,2,*</sup></span>
+      <span><a href="https://yixinyang-00.github.io/">Yixin Yang</a><sup>1,2</sup></span>
+      <span><a href="https://8lo8lobei.github.io/">Beier Xiao</a><sup>2</sup></span>
+      <span><a href="https://freebutuselesssoul.github.io/">Chengxuan Zhu</a><sup>1,2</sup></span>
+      <span>Chun Chen<sup>1</sup></span>
+      <span>Qibin Yang<sup>1,2</sup></span>
+      <span><a href="https://lirang04.github.io/">Rang Li</a><sup>1,2</sup></span>
+      <span>Sinan Du<sup>1</sup></span>
+      <span><a href="https://imyangty.com/">Taoyu Yang</a><sup>1,2</sup></span>
+      <span><a href="https://julianjuaner.github.io/">Yuechen Zhang</a><sup>1</sup></span>
+      <span>Yuzhe Weng<sup>1,3</sup></span>
+      <span><a href="https://bajimh.github.io/">Zhaojun Huang</a><sup>1,2</sup></span>
+      <span><a href="https://camera.pku.edu.cn/team">Boxin Shi</a><sup>2,†</sup></span>
+      <span><a href="https://renshuhuai-andy.github.io/">Shuhuai Ren</a><sup>1,†</sup></span>
+    </p>
+    <p class="affils"><span><sup>1</sup>LLM Core, Xiaomi</span><span><sup>2</sup>Peking University</span><span><sup>3</sup>University of Science and Technology of China</span></p>
+    <p class="notes"><sup>*</sup>Contribution done during internship at Xiaomi MiMo Team &nbsp; <sup>†</sup>Co-corresponding authors</p>
+    <div class="links">
+      <span class="btn is-disabled" title="Coming soon">Paper<small>soon</small></span>
+      <span class="btn is-disabled" title="Coming soon">Code<small>soon</small></span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="section-tight" id="teaser" aria-label="Teaser">
+  <div class="wrap">
+    <div class="teaser-fig" id="teaser-root"></div>
+    <p class="caption"><span class="on-hover">Click a photo to enlarge it. Hover a checklist row to find it in the prompt, or a benchmark bar to see one method's scores.</span><span class="on-touch">Tap a photo to enlarge it, a checklist row to find it in the prompt, or a benchmark bar to see one method's scores.</span> As in the paper, the bar axis compresses 0–50; † GEMS covers Mind-Bench text-to-image only.</p>
+  </div>
+</section>
+
+<section class="section" id="abstract">
+  <div class="wrap narrow">
+    <h2>Abstract</h2>
+    <p>Open text-to-image models struggle with requests that leave key content implicit or impose many explicit constraints. Multimodal agents can infer or retrieve this content and verify generated images, but for each request they must decide which operations to run and what information each one receives. We introduce <b>GenDAG</b>, an agentic framework that makes both decisions jointly by synthesizing a query-adaptive directed acyclic graph (DAG) whose edges carry typed intermediate results between operators. Before execution, a checker type-checks every edge and returns diagnostics for repair. After generation, visual checks against stated and inferred requirements guide regeneration. Using Qwen-Image-2.1 without fine-tuning, GenDAG scores 88.70 on WISE and 89.32 on T2I-CoReBench, exceeding direct generation with GPT-Image-2 and Nano Banana Pro, while trailing GPT-Image-2 by 1.51 points on GenEval2. Applied to GPT-Image-2, the same agent further improves the generation quality of this strong commercial model.</p>
+  </div>
+</section>
+
+<section class="section alt" id="overview">
+  <div class="wrap">
+    <div class="head">
+      <h2>How GenDAG works</h2>
+      <p>The agent writes a typed plan for the request, a checker validates it, and the executor runs it with visual feedback. <span class="on-hover">Hover any panel of the figure.</span><span class="on-touch">Tap any panel of the figure.</span></p>
+    </div>
+    <div class="overview" id="overview-root"></div>
+  </div>
+</section>
+
+<section class="section" id="operators">
+  <div class="wrap">
+    <div class="head">
+      <h2>Typed operators</h2>
+      <p>Twelve operators, mined from about 156K agent trajectories, cover 86.68% of recorded actions. Select a type to see which operators produce and consume it, or an operator to see its inputs and output.</p>
+    </div>
+    <div class="card catalog" id="catalog"></div>
+    <div class="head head-sub">
+      <h3>Plan checking and repair</h3>
+      <p>A real first plan wires an image into a prompt port. Compare a bare rejection with a typed diagnostic.</p>
+    </div>
+    <div class="card checker" id="checker"></div>
+  </div>
+</section>
+
+<section class="section alt" id="explorer">
+  <div class="wrap">
+    <div class="head">
+      <h2>Explore plans</h2>
+      <p>Ten selected plans, two per benchmark, executed with Qwen-Image-2.1. Select a node to see what it produced.</p>
+    </div>
+    <div class="case-picker" id="case-picker" role="tablist" aria-label="Example requests"></div>
+    <div class="explorer" id="explorer-view"></div>
+  </div>
+</section>
+
+<section class="section" id="results">
+  <div class="wrap">
+    <div class="head">
+      <h2>Results</h2>
+      <p>All open methods use the same Qwen-Image-2.1 generator. Scores are on a 0–100 scale and come from each benchmark's judge.</p>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="seg" id="bench-tabs" role="tablist" aria-label="Benchmark"></div>
+        <div class="seg seg-small" id="mb-tabs" role="tablist" aria-label="Mind-Bench split" hidden></div>
+        <button class="linkish" id="table-toggle" aria-expanded="false">Table</button>
+      </div>
+      <div class="legend" id="main-legend"></div>
+      <div id="main-chart" class="chart"></div>
+      <div id="main-table" class="table-wrap" hidden></div>
+      <div id="main-samples"></div>
+      <p class="fine">PE is the generator's official prompt enhancement.</p>
+      <p class="fine" id="mb-note" hidden>† GEMS and GenRouter take no image inputs, so their Mind-Bench score covers the 350 text-to-image requests.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>T2I-CoReBench by dimension</h3><div class="legend" id="core-legend"></div></div>
+      <div id="core-chart" class="chart"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Across image generators</h3><div class="legend" id="backend-legend"></div></div>
+      <div id="backend-chart" class="chart"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="analysis">
+  <div class="wrap">
+    <div class="head">
+      <h2>Analysis</h2>
+      <p>Plans follow what each benchmark leaves unsaid, and one checked plan needs fewer LLM requests and tokens than step-by-step tool use.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Plans containing each operator</h3><span class="muted">7,368 executions with Qwen-Image-2.1</span></div>
+      <div id="heatmap" class="chart"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>GenDAG vs. ReAct with the same operators</h3><div class="legend" id="policy-legend"></div></div>
+      <div id="policy-chart" class="chart"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="gallery">
+  <div class="wrap">
+    <div class="head">
+      <h2>Gallery</h2>
+      <p>Curated prompts from the paper. Each image is a system's first execution, and badges show the benchmark judge's score.</p>
+    </div>
+    <div class="card-head gallery-head">
+      <div class="seg" id="gallery-tabs" role="tablist" aria-label="Benchmark filter"></div>
+      <label class="switch"><input type="checkbox" id="all-systems"><span></span>All 9 systems</label>
+    </div>
+    <div id="gallery-grid" class="gallery"></div>
+
+    <div class="head head-sub">
+      <h3>Direct generation vs. GenDAG with each generator</h3>
+      <p>The three generators of the backend study on the same prompts, selected in the supplement for GPT-Image-2.</p>
+    </div>
+    <div class="card-head"><div class="seg" id="pair-gen" role="tablist" aria-label="Generator"></div><div class="seg seg-small" id="pair-tabs" role="tablist" aria-label="Benchmark"></div></div>
+    <div class="pairs" id="pairs"></div>
+  </div>
+</section>
+
+
+</main>
+
+<footer class="footer"><div class="wrap">Images were generated by the listed systems for public benchmark prompts.</div></footer>
+
+<div class="lightbox" id="lightbox" hidden>
+  <div class="lb-top"><span class="lb-count"></span><button class="lb-close" aria-label="Close">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
+  <button class="lb-nav lb-prev" aria-label="Previous"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <figure class="lb-stage" role="dialog" aria-modal="true" aria-label="Image viewer">
+    <img class="lb-img" alt="">
+    <figcaption class="lb-cap"></figcaption>
+  </figure>
+  <button class="lb-nav lb-next" aria-label="Next"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <div class="lb-strip"></div>
+</div>
+<div class="tooltip" id="tooltip" role="tooltip" hidden></div>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>
