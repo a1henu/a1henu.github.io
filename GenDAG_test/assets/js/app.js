@@ -232,7 +232,7 @@ function subBez(P, t0, t1) {
 /* ------------------------------------------------------------------ plan DAG with labelled pills (teaser style, paper Fig. 3 slot layout) */
 // Slots follow the paper figures (Analyze 0, branches 1.35, Rewrite 2.7, output 4; rows in units of RY);
 // nodes are pills with an operator icon and name, as in the teaser's GenDAG plan.
-const PL = { SX: 120, RY: 70, PH: 30, FONT: 12.5, EDGE: '#9aa8bb', X0: -78, X1: 598, Y0: -122, Y1: 104 };
+const PL = { SX: 120, RY: 70, PH: 30, FONT: 12.5, EDGE: '#9aa8bb', X0: -78, X1: 598, Y0: -122, Y1: 112 };
 let _measure;
 function textW(t) {
   if (!_measure) { _measure = document.createElement('canvas').getContext('2d'); }
@@ -649,6 +649,7 @@ const R4 = (r, pad = 0) => `x="${fx(r[0] - pad)}" y="${fx(r[1] - pad)}" width="$
   for (const t of D.tables.types) { const c = h('button', { class: 'type-chip', onclick: () => pickType(t.type) }, t.type); chipEls[t.type] = c; chips.append(c); }
   root.append(groups, h('div', { class: 'cat-side' }, chips, info));
   const reset = () => { Object.values(btns).forEach(b => b.classList.remove('sel', 'dim', 'prod', 'cons')); Object.values(chipEls).forEach(c => c.classList.remove('sel', 'in', 'out')); };
+  const opLink = op => `<button class="io-link" data-op="${esc(op)}">${esc(op)}</button>`;
   let pickType = function (t) {
     reset(); chipEls[t].classList.add('sel');
     const prod = [], cons = [];
@@ -660,14 +661,14 @@ const R4 = (r, pad = 0) => `x="${fx(r[0] - pad)}" y="${fx(r[1] - pad)}" width="$
     }
     const ty = D.tables.types.find(x => x.type === t);
     chipEls[t].classList.add('sel');
-    info.innerHTML = `<b style="font-family:var(--mono)">${esc(t)}</b>: ${esc(ty.content)}.<div style="margin-top:6px"><b>Produced by</b> ${prod.length ? prod.join(', ') : (t === 'Query' ? 'the user' : '—')}<br><b>Consumed by</b> ${cons.length ? cons.join(', ') : '—'}</div><div class="key"><span class="k-prod">produces</span><span class="k-cons">consumes</span></div>`;
+    info.innerHTML = `<b style="font-family:var(--mono)">${esc(t)}</b>: ${esc(ty.content)}.<div style="margin-top:6px"><b>Produced by</b> ${prod.length ? prod.map(opLink).join(', ') : (t === 'Query' ? 'the user' : '—')}<br><b>Consumed by</b> ${cons.length ? cons.map(opLink).join(', ') : '—'}</div><div class="key"><span class="k-prod">produces</span><span class="k-cons">consumes</span></div>`;
   };
   let pickOp = function (op) {
     reset(); btns[op].classList.add('sel');
     const o = SIG[op], ins = parsePorts(o.inputs);
     ins.forEach(p => chipEls[p.type] && chipEls[p.type].classList.add('in'));
     chipEls[o.output] && chipEls[o.output].classList.add('out');
-    const tag = (t, cls) => `<span class="io-t ${cls}">${esc(t)}</span>`;
+    const tag = (t, cls) => `<button class="io-t ${cls}" data-type="${esc(t.replace(/^\[|\]$/g, ''))}" title="Show the ${esc(t.replace(/^\[|\]$/g, ''))} type">${esc(t)}</button>`;
     info.innerHTML = `<b>${esc(op)}</b>: ${esc(o.function)}.` +
       `<div class="io"><div class="io-box in"><h6>Input</h6>${ins.map(p => tag(p.opt ? `[${p.type}]` : p.type, 'in')).join('')}</div>` +
       `<div class="io-arrow">→</div><div class="io-box out"><h6>Output</h6>${tag(o.output, 'out')}</div></div>` +
@@ -679,6 +680,11 @@ const R4 = (r, pad = 0) => `x="${fx(r[0] - pad)}" y="${fx(r[1] - pad)}" width="$
   const pT = pickType, pO = pickOp;
   pickType = t => { if (current === 't:' + t) return clear(); current = 't:' + t; pT(t); };
   pickOp = op => { if (current === 'o:' + op) return clear(); current = 'o:' + op; pO(op); };
+  info.addEventListener('click', ev => {
+    const t = ev.target.closest('[data-type]'), o = ev.target.closest('[data-op]');
+    if (t && chipEls[t.dataset.type]) { pickType(t.dataset.type); chipEls[t.dataset.type].focus({ preventScroll: true }); }
+    else if (o && btns[o.dataset.op]) { pickOp(o.dataset.op); btns[o.dataset.op].focus({ preventScroll: true }); }
+  });
   clear();
 })();
 
@@ -752,17 +758,37 @@ const R4 = (r, pad = 0) => `x="${fx(r[0] - pad)}" y="${fx(r[1] - pad)}" width="$
     const st = scoreText(c.bench, c.score);
     const finalImg = h('img', { src: c.final.l, alt: 'Final image' });
     const strip = h('div', { class: 'checks-strip' });
-    const side = h('div', { class: 'ex-card ex-side' }, h('div', { class: 'ex-label' }, h('span', {}, 'Output'), h('span', { style: 'text-transform:none;letter-spacing:0;font-weight:500' }, st ? `${METRIC[c.bench]} ${st}${c.bench === 'wise' || c.bench === 'mindbench' ? '' : ' / 100'}` : '')),
+    const benchTag = st ? `${METRIC[c.bench]} ${st}${c.bench === 'wise' || c.bench === 'mindbench' ? '' : ' / 100'}` : '';
+    const outTag = h('span', { style: 'text-transform:none;letter-spacing:0;font-weight:500' }, benchTag);
+    const side = h('div', { class: 'ex-card ex-side' }, h('div', { class: 'ex-label' }, h('span', {}, 'Output'), outTag),
       h('div', { class: 'final' }, finalImg), strip);
-    finalImg.addEventListener('click', () => openLB([{ src: c.final.l, title: 'GenDAG w/ Qwen-Image-2.1', score: st ? `${METRIC[c.bench]} ${st}` : '', prompt: c.prompt }]));
     const detail = h('div', { class: 'ex-card ex-detail' });
     view.append(dagCard, side, detail);
     // final-check strip
     const rounds = c.checks;
     let best = 0; rounds.forEach((r, k) => { if ((r.pass_ratio ?? 0) > (rounds[best].pass_ratio ?? 0)) best = k; });
+    // the shown round: the final output is the best round; the thumbnails switch between rounds
+    const roundName = k => (k ? `Regeneration ${k}` : 'Plan output');
+    const pct = k => Math.round(100 * (rounds[k].pass_ratio ?? 0));
+    const roundItems = rounds.map((r, k) => { const im = k === best ? c.final : r.image; return im ? { src: im.l, thumb: im.s, title: k === best ? 'GenDAG w/ Qwen-Image-2.1' : roundName(k), score: k === best && st ? `${METRIC[c.bench]} ${st}` : `${pct(k)}% of checks passed`, prompt: c.prompt } : { src: '' }; });
+    let shown = best;
+    finalImg.addEventListener('click', () => (rounds.length > 1 ? openLB(roundItems, shown) : openLB([{ src: c.final.l, title: 'GenDAG w/ Qwen-Image-2.1', score: st ? `${METRIC[c.bench]} ${st}` : '', prompt: c.prompt }])));
     if (rounds.length > 1) {
       strip.append(h('span', { class: 'cs-label' }, 'Final', h('br'), 'checks'));
-      rounds.forEach((r, k) => { const b = h('button', { class: k === best ? 'best' : '', 'aria-label': k ? `Regeneration ${k}` : 'Plan output', html: `<img src="${r.image ? r.image.s : ''}" alt=""><span class="pc">${Math.round(100 * (r.pass_ratio ?? 0))}%</span>` }); b.addEventListener('click', () => sel('__checks')); strip.append(b); });
+      roundItems.forEach(it => { if (it.src) new Image().src = it.src; });   // switching rounds is then instant
+      const show = k => {
+        shown = k;
+        finalImg.src = roundItems[k].src || c.final.l;
+        finalImg.alt = roundItems[k].title || 'Final image';
+        outTag.textContent = k === best ? benchTag : `${roundName(k)} · ${pct(k)}% of checks passed`;
+        $$('button', strip).forEach((b, i) => { b.classList.toggle('sel', i === k); b.setAttribute('aria-pressed', String(i === k)); });
+      };
+      rounds.forEach((r, k) => {
+        const b = h('button', { class: k === best ? 'best' : '', 'aria-label': `${roundName(k)}, ${pct(k)}% of checks passed`, title: `${roundName(k)} · ${pct(k)}% of checks passed`, html: `<img src="${r.image ? r.image.s : ''}" alt=""><span class="pc">${pct(k)}%</span>` });
+        b.addEventListener('click', () => { show(k); sel('__checks'); });
+        strip.append(b);
+      });
+      show(best);
     } else strip.append(h('span', { class: 'cs-label', html: rounds[0] && rounds[0].correct ? `${MARK.y} The plan's output passed every final check.` : `Final checks: ${Math.round(100 * ((rounds[0] || {}).pass_ratio || 0))}% passed.` }));
     const dag = renderPillDag(dagBox, c, D.layouts[c.case_id] || { pos: {}, arcs: [] }, { onSelect: id => sel(id), refThumb: c.inputs[0] && c.inputs[0].s });
     jsonBtn.addEventListener('click', () => { sel('__json'); });
@@ -1105,6 +1131,7 @@ const COLOR_OF = n => n.startsWith('GenDAG w/ Qwen') ? '#2a78d6' : n.startsWith(
         const low = cell.score && cell.score.max === 1 && cell.score.v < .5;
         const im = h('div', { class: 'im' + (i ? ' ours' : ''), role: 'button', tabindex: '0' }, h('img', { src: it.thumb, alt: it.title, loading: 'lazy' }), cell.score ? h('span', { class: 'badge' + (low ? ' low' : '') }, cell.score.text) : null);
         im.addEventListener('click', () => openLB(items, i));
+        im.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openLB(items, i); } });
         return h('figure', {}, im, h('figcaption', { class: i ? 'ours' : '' }, it.title));
       };
       const pr = h('p', { class: 'pair-prompt', title: 'Click to expand' }, p.prompt);
